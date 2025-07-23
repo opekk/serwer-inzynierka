@@ -1,7 +1,7 @@
 export default function Navbar() {
     return(
          <nav className="bg-white font-inter border border-gray-200 rounded shadow-xl">
-            <div className="max-w-8xl mx-auto px-3 sm:px-5 lg:px-8 mr-26 ml-26">
+            <div className="max-w-8xl mx-auto px-3 sm:px-5 lg:px-8 ml-20">
                 <div className="flex items-center justify-between h-16 w-full">
                     <div className="text-slate-900 text-xl font-bold mr-8">
                         <a href="">AuctionHub</a></div>
