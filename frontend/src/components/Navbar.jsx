@@ -4,9 +4,9 @@ export default function Navbar() {
             <div class="max-w-8xl mx-auto px-3 sm:px-5 lg:px-8 ml-20">
                 <div class="flex items-center justify-between h-16 w-full">
                     <div class="text-slate-900 text-xl font-bold mr-8">
-                        <a href="">AuctionHub</a></div>
+                        <a href="/test">AuctionHub</a></div>
                     <div class="flex flex-1 space-x-4">
-                        <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Strona Główna</a>
+                        <a href="/main" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Strona Główna</a>
                         <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Aukcje na zywo</a>
                         <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Kategorie</a>
                         <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Domy Aukcyjne</a>
@@ -20,5 +20,5 @@ export default function Navbar() {
             </div>
         </nav>
     )
-};
+}; 
 
