@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
+<<<<<<< HEAD
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isAnimating, setIsAnimating] = useState(false)
 
@@ -36,6 +37,20 @@ export default function Navbar() {
                         <Link to="/" className="hover:text-blue-500 transition-colors duration-200">
                             AuctionHub
                         </Link>
+=======
+    return(
+         <nav class="bg-white font-inter border border-gray-200 rounded shadow-xl">
+            <div class="max-w-8xl mx-auto px-3 sm:px-5 lg:px-8 ml-20">
+                <div class="flex items-center justify-between h-16 w-full">
+                    <div class="text-slate-900 text-xl font-bold mr-8">
+                        <a href="/test">AuctionHub</a></div>
+                    <div class="flex flex-1 space-x-4">
+                        <a href="/main" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Strona Główna</a>
+                        <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Aukcje na zywo</a>
+                        <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Kategorie</a>
+                        <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Domy Aukcyjne</a>
+                        <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Jak to działa?</a>
+>>>>>>> 10f698e (Poprawka w Navbar.jsx)
                     </div>
 
                     {/* Desktop Navigation Links */}
@@ -177,4 +192,9 @@ export default function Navbar() {
             </div>
         </nav>
     )
+<<<<<<< HEAD
 }
+=======
+}; 
+
+>>>>>>> 10f698e (Poprawka w Navbar.jsx)
