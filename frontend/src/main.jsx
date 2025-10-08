@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-<<<<<<< HEAD
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './styles/index.css'
 // import tw-elements CSS to enable theme utility classes like `bg-primary`
@@ -34,13 +33,5 @@ createRoot(document.getElementById('root')).render(
         </Routes>
       </WebGPUCanvasProvider>
     </BrowserRouter>
-=======
-import './styles/index.css'
-import TestPage from './pages/TestPage.jsx'
-
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-   <TestPage />
->>>>>>> c820f05 (stworzenie componentu Footer, dodanie contentu na strone testowa.)
   </StrictMode>,
 )
