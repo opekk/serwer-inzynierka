@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles/index.css'
 import TestPage from './pages/TestPage.jsx'
 import MainPage from './pages/MainPage.jsx'
+import Auctions from './pages/Auctions.jsx'
 
 function AppRouter() {
   const path = window.location.pathname
@@ -12,7 +13,10 @@ function AppRouter() {
   if (path === '/test') {
     return <TestPage />
   }
-  return <MainPage />
+
+  if (path === '/auctions') {
+    return <Auctions />
+  } 
 }
 
 createRoot(document.getElementById('root')).render(
