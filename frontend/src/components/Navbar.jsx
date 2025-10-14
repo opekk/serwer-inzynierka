@@ -7,7 +7,7 @@ export default function Navbar() {
                         <a href="/test">AuctionHub</a></div>
                     <div class="flex flex-1 space-x-4">
                         <a href="/main" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Strona Główna</a>
-                        <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Aukcje na zywo</a>
+                        <a href="/auctions" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Aukcje na zywo</a>
                         <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Kategorie</a>
                         <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Domy Aukcyjne</a>
                         <a href="#" class="text-slate-500 px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-200">Jak to działa?</a>
