@@ -4,6 +4,7 @@ import './styles/index.css'
 import TestPage from './pages/TestPage.jsx'
 import MainPage from './pages/MainPage.jsx'
 import Auctions from './pages/Auctions.jsx'
+import AuctionView from './pages/AuctionView.jsx'
 
 function AppRouter() {
   const path = window.location.pathname
@@ -17,6 +18,10 @@ function AppRouter() {
   if (path === '/auctions') {
     return <Auctions />
   } 
+
+  if (path === '/auctionview') {
+    return <AuctionView />
+  }
 }
 
 createRoot(document.getElementById('root')).render(
