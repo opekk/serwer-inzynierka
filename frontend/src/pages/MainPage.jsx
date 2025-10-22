@@ -89,9 +89,9 @@ export default function MainPage() {
           <div class="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
             <h3 class="text-lg font-semibold">Przedmiot 1</h3>
             <p class="text-gray-500 mb-4">Dom aukcyjny 1</p>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg">
+            <a href="/auctionview" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg">
               Licytuj teraz
-            </button>
+            </a>
           </div>  
           
 
