@@ -1,6 +1,7 @@
 import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import WebGPUCanvas from '../components/WebGPUCanvas';
 
 export default function AuctionView() {
  return (
@@ -28,10 +29,13 @@ export default function AuctionView() {
      
      
       {/* tu macie placeholderek ma model 3d */}
-      <div className="bg-gray-600 h-140">
-        <div className="flex flex-col">
-        
-        </div>
+      {/* WebGPU 3D Canvas */}
+      <div className="bg-black flex items-center justify-center p-4">
+        <WebGPUCanvas 
+          width={800}
+          height={600}
+          showControls={true}
+        />
       </div>
 
       
