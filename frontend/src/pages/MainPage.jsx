@@ -1,6 +1,7 @@
 import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import WebGPUCanvas from '../components/WebGPUCanvas'
 
 export default function MainPage() {
   return (
@@ -37,14 +38,17 @@ export default function MainPage() {
                 <article class="w-full max-w-md bg-white/10 rounded-xl p-8 shadow-lg">
                   <div class="flex flex-col items-center text-center space-y-4">
 
-        <div class="w-full">
-          <div class="rounded-lg overflow-hidden border border-white/10 shadow-inner"
-               style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02))' }}>
-            <div class="w-full h-50 bg-gradient-to-br from-indigo-600/20 to-purple-600/10 flex items-center justify-center text-white">
-              <span class="">3D model jakis tu</span>
-            </div>
-          </div> 
-        </div>
+                    <div class="w-full">
+                      <div class="rounded-lg overflow-hidden border border-white/10 shadow-inner">
+                        {/* Integrated WebGPU Canvas */}
+                        <WebGPUCanvas 
+                          width={384}
+                          height={300}
+                          showControls={false}
+                          className="w-full"
+                        />
+                      </div> 
+                    </div>
 
                     <h3 class="text-xl font-semibold">Interaktywna wizualizacja 3D</h3>
                     <p class="text-sky-200 text-sm">Obracaj, przybliżaj i poznawaj każdy szczegół przed licytacją.</p>
