@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import './styles/index.css'
 import TestPage from './pages/TestPage.jsx'
 import MainPage from './pages/MainPage.jsx'
@@ -8,7 +10,7 @@ import AuctionView from './pages/AuctionView.jsx'
 
 function AppRouter() {
   const path = window.location.pathname
-  if (path === '/main' || path === '') {
+  if (path === '/main' || path === '/') {
     return <MainPage />
   }
   if (path === '/test') {
