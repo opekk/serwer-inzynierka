@@ -1,4 +1,41 @@
 // include: shell.js
+// include: minimum_runtime_check.js
+(function() {
+  // "30.0.0" -> 300000
+  function humanReadableVersionToPacked(str) {
+    str = str.split('-')[0]; // Remove any trailing part from e.g. "12.53.3-alpha"
+    var vers = str.split('.').slice(0, 3);
+    while(vers.length < 3) vers.push('00');
+    vers = vers.map((n, i, arr) => n.padStart(2, '0'));
+    return vers.join('');
+  }
+  // 300000 -> "30.0.0"
+  var packedVersionToHumanReadable = n => [n / 10000 | 0, (n / 100 | 0) % 100, n % 100].join('.');
+
+  var TARGET_NOT_SUPPORTED = 2147483647;
+
+  var currentNodeVersion = typeof process !== 'undefined' && process?.versions?.node ? humanReadableVersionToPacked(process.versions.node) : TARGET_NOT_SUPPORTED;
+  if (currentNodeVersion < 160000) {
+    throw new Error(`This emscripten-generated code requires node v${ packedVersionToHumanReadable(160000) } (detected v${packedVersionToHumanReadable(currentNodeVersion)})`);
+  }
+
+  var currentSafariVersion = typeof navigator !== 'undefined' && navigator?.userAgent?.includes("Safari/") && navigator.userAgent.match(/Version\/(\d+\.?\d*\.?\d*)/) ? humanReadableVersionToPacked(navigator.userAgent.match(/Version\/(\d+\.?\d*\.?\d*)/)[1]) : TARGET_NOT_SUPPORTED;
+  if (currentSafariVersion < 150000) {
+    throw new Error(`This emscripten-generated code requires Safari v${ packedVersionToHumanReadable(150000) } (detected v${currentSafariVersion})`);
+  }
+
+  var currentFirefoxVersion = typeof navigator !== 'undefined' && navigator?.userAgent?.match(/Firefox\/(\d+(?:\.\d+)?)/) ? parseFloat(navigator.userAgent.match(/Firefox\/(\d+(?:\.\d+)?)/)[1]) : TARGET_NOT_SUPPORTED;
+  if (currentFirefoxVersion < 79) {
+    throw new Error(`This emscripten-generated code requires Firefox v79 (detected v${currentFirefoxVersion})`);
+  }
+
+  var currentChromeVersion = typeof navigator !== 'undefined' && navigator?.userAgent?.match(/Chrome\/(\d+(?:\.\d+)?)/) ? parseFloat(navigator.userAgent.match(/Chrome\/(\d+(?:\.\d+)?)/)[1]) : TARGET_NOT_SUPPORTED;
+  if (currentChromeVersion < 85) {
+    throw new Error(`This emscripten-generated code requires Chrome v85 (detected v${currentChromeVersion})`);
+  }
+})();
+
+// end include: minimum_runtime_check.js
 // The Module object: Our interface to the outside world. We import
 // and export values on it. There are various ways Module can be used:
 // 1. Not defined. We create it here
@@ -18,16 +55,16 @@ var Module = typeof Module != 'undefined' ? Module : {};
 // setting the ENVIRONMENT setting at compile time (see settings.js).
 
 // Attempt to auto-detect the environment
-var ENVIRONMENT_IS_WEB = typeof window == 'object';
-var ENVIRONMENT_IS_WORKER = typeof WorkerGlobalScope != 'undefined';
+var ENVIRONMENT_IS_WEB = !!globalThis.window;
+var ENVIRONMENT_IS_WORKER = !!globalThis.WorkerGlobalScope;
 // N.b. Electron.js environment is simultaneously a NODE-environment, but
 // also a web environment.
-var ENVIRONMENT_IS_NODE = typeof process == 'object' && process.versions?.node && process.type != 'renderer';
+var ENVIRONMENT_IS_NODE = globalThis.process?.versions?.node && globalThis.process?.type != 'renderer';
 var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\Konrad\AppData\Local\Temp\tmpqgk41p4f.js
+// include: C:\Users\Konrad\AppData\Local\Temp\tmp264k7biy.js
 
   Module['expectedDataFileDownloads'] ??= 0;
   Module['expectedDataFileDownloads']++;
@@ -36,7 +73,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
     var isPthread = typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD;
     var isWasmWorker = typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER;
     if (isPthread || isWasmWorker) return;
-    var isNode = typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string';
+    var isNode = globalThis.process?.versions?.node && globalThis.process?.type != 'renderer';
     async function loadPackage(metadata) {
 
       var PACKAGE_PATH = '';
@@ -119,8 +156,8 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 Module['FS_createPath']("/", "D:", true, true);
 Module['FS_createPath']("/D:", "code", true, true);
 Module['FS_createPath']("/D:/code", "WebGPU", true, true);
-Module['FS_createPath']("/D:/code/WebGPU", "inz2", true, true);
-Module['FS_createPath']("/D:/code/WebGPU/inz2", "resources", true, true);
+Module['FS_createPath']("/D:/code/WebGPU", "inz", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz", "resources", true, true);
 
       for (var file of metadata['files']) {
         var name = file['filename']
@@ -160,25 +197,25 @@ Module['FS_createPath']("/D:/code/WebGPU/inz2", "resources", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "D:/code/WebGPU/inz2/resources/cobblestone_floor_08_diff_2k.jpg", "start": 0, "end": 2289909}, {"filename": "D:/code/WebGPU/inz2/resources/cobblestone_floor_08_nor_gl_2k.png", "start": 2289909, "end": 10670339}, {"filename": "D:/code/WebGPU/inz2/resources/cube.obj", "start": 10670339, "end": 10671250}, {"filename": "D:/code/WebGPU/inz2/resources/cylinder.obj", "start": 10671250, "end": 10674516}, {"filename": "D:/code/WebGPU/inz2/resources/fourareen.mtl", "start": 10674516, "end": 10674824}, {"filename": "D:/code/WebGPU/inz2/resources/fourareen.obj", "start": 10674824, "end": 15766559}, {"filename": "D:/code/WebGPU/inz2/resources/fourareen2K_albedo.jpg", "start": 15766559, "end": 17171241}, {"filename": "D:/code/WebGPU/inz2/resources/fourareen2K_normals.png", "start": 17171241, "end": 22551425}, {"filename": "D:/code/WebGPU/inz2/resources/mammoth.obj", "start": 22551425, "end": 38417981}, {"filename": "D:/code/WebGPU/inz2/resources/plane.obj", "start": 38417981, "end": 38418283}, {"filename": "D:/code/WebGPU/inz2/resources/pyramid.obj", "start": 38418283, "end": 38426195}, {"filename": "D:/code/WebGPU/inz2/resources/pyramid.txt", "start": 38426195, "end": 38427280}, {"filename": "D:/code/WebGPU/inz2/resources/shader.wgsl", "start": 38427280, "end": 38430922}, {"filename": "D:/code/WebGPU/inz2/resources/webgpu.txt", "start": 38430922, "end": 38431458}], "remote_package_size": 38431458});
+    loadPackage({"files": [{"filename": "D:/code/WebGPU/inz/resources/autumn_park_4k.jpg", "start": 0, "end": 476532}, {"filename": "D:/code/WebGPU/inz/resources/cobblestone_floor_08_diff_2k.jpg", "start": 476532, "end": 2766441}, {"filename": "D:/code/WebGPU/inz/resources/cobblestone_floor_08_nor_gl_2k.png", "start": 2766441, "end": 11146871}, {"filename": "D:/code/WebGPU/inz/resources/cube.obj", "start": 11146871, "end": 11147782}, {"filename": "D:/code/WebGPU/inz/resources/cylinder.obj", "start": 11147782, "end": 11151048}, {"filename": "D:/code/WebGPU/inz/resources/fourareen.mtl", "start": 11151048, "end": 11151356}, {"filename": "D:/code/WebGPU/inz/resources/fourareen.obj", "start": 11151356, "end": 16243091}, {"filename": "D:/code/WebGPU/inz/resources/fourareen2K_albedo.jpg", "start": 16243091, "end": 17647773}, {"filename": "D:/code/WebGPU/inz/resources/fourareen2K_normals.png", "start": 17647773, "end": 23027957}, {"filename": "D:/code/WebGPU/inz/resources/mammoth.obj", "start": 23027957, "end": 38894513}, {"filename": "D:/code/WebGPU/inz/resources/plane.obj", "start": 38894513, "end": 38894815}, {"filename": "D:/code/WebGPU/inz/resources/pyramid.obj", "start": 38894815, "end": 38902727}, {"filename": "D:/code/WebGPU/inz/resources/pyramid.txt", "start": 38902727, "end": 38903812}, {"filename": "D:/code/WebGPU/inz/resources/shader.wgsl", "start": 38903812, "end": 38907454}, {"filename": "D:/code/WebGPU/inz/resources/texture.jpg", "start": 38907454, "end": 41197363}, {"filename": "D:/code/WebGPU/inz/resources/webgpu.txt", "start": 41197363, "end": 41197899}], "remote_package_size": 41197899});
 
   })();
 
-// end include: C:\Users\Konrad\AppData\Local\Temp\tmpqgk41p4f.js
-// include: C:\Users\Konrad\AppData\Local\Temp\tmpnxtbn25k.js
+// end include: C:\Users\Konrad\AppData\Local\Temp\tmp264k7biy.js
+// include: C:\Users\Konrad\AppData\Local\Temp\tmpxs1wrilv.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpnxtbn25k.js
-// include: C:\Users\Konrad\AppData\Local\Temp\tmpiznn_bul.js
+  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpxs1wrilv.js
+// include: C:\Users\Konrad\AppData\Local\Temp\tmpiyfd599n.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpiznn_bul.js
+  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpiyfd599n.js
 
 
 var arguments_ = [];
@@ -189,7 +226,7 @@ var quit_ = (status, toThrow) => {
 
 // In MODULARIZE mode _scriptName needs to be captured already at the very top of the page immediately when the page is parsed, so it is generated there
 // before the page load. In non-MODULARIZE modes generate it here.
-var _scriptName = typeof document != 'undefined' ? document.currentScript?.src : undefined;
+var _scriptName = globalThis.document?.currentScript?.src;
 
 if (typeof __filename != 'undefined') { // Node
   _scriptName = __filename;
@@ -211,15 +248,8 @@ function locateFile(path) {
 var readAsync, readBinary;
 
 if (ENVIRONMENT_IS_NODE) {
-  const isNode = typeof process == 'object' && process.versions?.node && process.type != 'renderer';
+  const isNode = globalThis.process?.versions?.node && globalThis.process?.type != 'renderer';
   if (!isNode) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
-
-  var nodeVersion = process.versions.node;
-  var numericVersion = nodeVersion.split('.').slice(0, 3);
-  numericVersion = (numericVersion[0] * 10000) + (numericVersion[1] * 100) + (numericVersion[2].split('-')[0] * 1);
-  if (numericVersion < 160000) {
-    throw new Error('This emscripten-generated code requires node v16.0.0 (detected v' + nodeVersion + ')');
-  }
 
   // These modules will usually be used on Node.js. Load them eagerly to avoid
   // the complexity of lazy-loading.
@@ -263,9 +293,6 @@ readAsync = async (filename, binary = true) => {
 } else
 if (ENVIRONMENT_IS_SHELL) {
 
-  const isNode = typeof process == 'object' && process.versions?.node && process.type != 'renderer';
-  if (isNode || typeof window == 'object' || typeof WorkerGlobalScope != 'undefined') throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
-
 } else
 
 // Note that this includes Node.js workers when relevant (pthreads is enabled).
@@ -279,7 +306,7 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
     // infer anything from them.
   }
 
-  if (!(typeof window == 'object' || typeof WorkerGlobalScope != 'undefined')) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
+  if (!(globalThis.window || globalThis.WorkerGlobalScope)) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
 
   {
 // include: web_or_worker_shell_read.js
@@ -360,7 +387,7 @@ assert(!ENVIRONMENT_IS_SHELL, 'shell environment detected but not enabled at bui
 
 var wasmBinary;
 
-if (typeof WebAssembly != 'object') {
+if (!globalThis.WebAssembly) {
   err('no native wasm support detected');
 }
 
@@ -456,7 +483,7 @@ function dbg(...args) {
   var h16 = new Int16Array(1);
   var h8 = new Int8Array(h16.buffer);
   h16[0] = 0x6373;
-  if (h8[0] !== 0x73 || h8[1] !== 0x63) throw 'Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)';
+  if (h8[0] !== 0x73 || h8[1] !== 0x63) abort('Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)');
 })();
 
 function consumedModuleProp(prop) {
@@ -505,7 +532,7 @@ function isExportedByForceFilesystem(name) {
  * are never placed in the global scope.
  */
 function hookGlobalSymbolAccess(sym, func) {
-  if (typeof globalThis != 'undefined' && !Object.getOwnPropertyDescriptor(globalThis, sym)) {
+  if (!Object.getOwnPropertyDescriptor(globalThis, sym)) {
     Object.defineProperty(globalThis, sym, {
       configurable: true,
       get() {
@@ -559,16 +586,13 @@ function unexportedRuntimeSymbol(sym) {
           msg += '. Alternatively, forcing filesystem support (-sFORCE_FILESYSTEM) can export this for you';
         }
         abort(msg);
-      }
+      },
     });
   }
 }
 
 // end include: runtime_debug.js
 // Memory management
-
-var wasmMemory;
-
 var
 /** @type {!Int8Array} */
   HEAP8,
@@ -616,7 +640,7 @@ function updateMemoryViews() {
 // include: memoryprofiler.js
 // end include: memoryprofiler.js
 // end include: runtime_common.js
-assert(typeof Int32Array != 'undefined' && typeof Float64Array !== 'undefined' && Int32Array.prototype.subarray != undefined && Int32Array.prototype.set != undefined,
+assert(globalThis.Int32Array && globalThis.Float64Array && Int32Array.prototype.subarray && Int32Array.prototype.set,
        'JS engine does not provide full typed array support');
 
 function preRun() {
@@ -733,6 +757,8 @@ function getBinarySync(file) {
   if (readBinary) {
     return readBinary(file);
   }
+  // Throwing a plain string here, even though it not normally adviables since
+  // this gets turning into an `abort` in instantiateArrayBuffer.
   throw 'both async and sync fetching of the wasm failed';
 }
 
@@ -761,8 +787,8 @@ async function instantiateArrayBuffer(binaryFile, imports) {
     err(`failed to asynchronously prepare wasm: ${reason}`);
 
     // Warn on some common problems.
-    if (isFileURI(wasmBinaryFile)) {
-      err(`warning: Loading from a file URI (${wasmBinaryFile}) is not supported in most browsers. See https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing`);
+    if (isFileURI(binaryFile)) {
+      err(`warning: Loading from a file URI (${binaryFile}) is not supported in most browsers. See https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing`);
     }
     abort(reason);
   }
@@ -821,12 +847,10 @@ async function createWasm() {
 
     
 
-    wasmMemory = wasmExports['memory'];
-    
-    assert(wasmMemory, 'memory not found in wasm exports');
+    assignWasmExports(wasmExports);
+
     updateMemoryViews();
 
-    assignWasmExports(wasmExports);
     removeRunDependency('wasm-instantiate');
     return wasmExports;
   }
@@ -858,8 +882,8 @@ async function createWasm() {
   if (Module['instantiateWasm']) {
     return new Promise((resolve, reject) => {
       try {
-        Module['instantiateWasm'](info, (mod, inst) => {
-          resolve(receiveInstance(mod, inst));
+        Module['instantiateWasm'](info, (inst, mod) => {
+          resolve(receiveInstance(inst, mod));
         });
       } catch(e) {
         err(`Module.instantiateWasm callback failed with error: ${e}`);
@@ -938,7 +962,7 @@ async function createWasm() {
       assert(id, 'addRunDependency requires an ID')
       assert(!runDependencyTracking[id]);
       runDependencyTracking[id] = 1;
-      if (runDependencyWatcher === null && typeof setInterval != 'undefined') {
+      if (runDependencyWatcher === null && globalThis.setInterval) {
         // Check for missing dependencies every few seconds
         runDependencyWatcher = setInterval(() => {
           if (ABORT) {
@@ -1015,7 +1039,7 @@ async function createWasm() {
   var noExitRuntime = true;
 
   var ptrToString = (ptr) => {
-      assert(typeof ptr === 'number');
+      assert(typeof ptr === 'number', `ptrToString expects a number, got ${typeof ptr}`);
       // Convert to 32-bit unsigned value
       ptr >>>= 0;
       return '0x' + ptr.toString(16).padStart(8, '0');
@@ -1056,7 +1080,7 @@ async function createWasm() {
       }
     };
 
-  var UTF8Decoder = typeof TextDecoder != 'undefined' ? new TextDecoder() : undefined;
+  var UTF8Decoder = globalThis.TextDecoder && new TextDecoder();
   
   var findStringEnd = (heapOrArray, idx, maxBytesToRead, ignoreNul) => {
       var maxIdx = idx + maxBytesToRead;
@@ -1454,8 +1478,7 @@ async function createWasm() {
             result = buf.slice(0, bytesRead).toString('utf-8');
           }
         } else
-        if (typeof window != 'undefined' &&
-          typeof window.prompt == 'function') {
+        if (globalThis.window?.prompt) {
           // Browser.
           result = window.prompt('Input: ');  // returns null on cancel
           if (result !== null) {
@@ -3299,7 +3322,7 @@ async function createWasm() {
         opts.flags = opts.flags || 0;
         opts.encoding = opts.encoding || 'binary';
         if (opts.encoding !== 'utf8' && opts.encoding !== 'binary') {
-          throw new Error(`Invalid encoding type "${opts.encoding}"`);
+          abort(`Invalid encoding type "${opts.encoding}"`);
         }
         var stream = FS.open(path, opts.flags);
         var stat = FS.stat(path);
@@ -3321,7 +3344,7 @@ async function createWasm() {
         if (ArrayBuffer.isView(data)) {
           FS.write(stream, data, 0, data.byteLength, undefined, opts.canOwn);
         } else {
-          throw new Error('Unsupported data type');
+          abort('Unsupported data type');
         }
         FS.close(stream);
       },
@@ -3616,8 +3639,8 @@ async function createWasm() {
       },
   forceLoadFile(obj) {
         if (obj.isDevice || obj.isFolder || obj.link || obj.contents) return true;
-        if (typeof XMLHttpRequest != 'undefined') {
-          throw new Error("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
+        if (globalThis.XMLHttpRequest) {
+          abort("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
         } else { // Command-line.
           try {
             obj.contents = readBinary(obj.url);
@@ -3648,7 +3671,7 @@ async function createWasm() {
             var xhr = new XMLHttpRequest();
             xhr.open('HEAD', url, false);
             xhr.send(null);
-            if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) throw new Error("Couldn't load " + url + ". Status: " + xhr.status);
+            if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) abort("Couldn't load " + url + ". Status: " + xhr.status);
             var datalength = Number(xhr.getResponseHeader("Content-length"));
             var header;
             var hasByteServing = (header = xhr.getResponseHeader("Accept-Ranges")) && header === "bytes";
@@ -3660,8 +3683,8 @@ async function createWasm() {
   
             // Function to get a range from the remote URL.
             var doXHR = (from, to) => {
-              if (from > to) throw new Error("invalid range (" + from + ", " + to + ") or no bytes requested!");
-              if (to > datalength-1) throw new Error("only " + datalength + " bytes available! programmer error!");
+              if (from > to) abort("invalid range (" + from + ", " + to + ") or no bytes requested!");
+              if (to > datalength-1) abort("only " + datalength + " bytes available! programmer error!");
   
               // TODO: Use mozResponseArrayBuffer, responseStream, etc. if available.
               var xhr = new XMLHttpRequest();
@@ -3675,7 +3698,7 @@ async function createWasm() {
               }
   
               xhr.send(null);
-              if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) throw new Error("Couldn't load " + url + ". Status: " + xhr.status);
+              if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) abort("Couldn't load " + url + ". Status: " + xhr.status);
               if (xhr.response !== undefined) {
                 return new Uint8Array(/** @type{Array<number>} */(xhr.response || []));
               }
@@ -3689,7 +3712,7 @@ async function createWasm() {
               if (typeof lazyArray.chunks[chunkNum] == 'undefined') {
                 lazyArray.chunks[chunkNum] = doXHR(start, end);
               }
-              if (typeof lazyArray.chunks[chunkNum] == 'undefined') throw new Error('doXHR failed!');
+              if (typeof lazyArray.chunks[chunkNum] == 'undefined') abort('doXHR failed!');
               return lazyArray.chunks[chunkNum];
             });
   
@@ -3719,8 +3742,8 @@ async function createWasm() {
           }
         }
   
-        if (typeof XMLHttpRequest != 'undefined') {
-          if (!ENVIRONMENT_IS_WORKER) throw 'Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc';
+        if (globalThis.XMLHttpRequest) {
+          if (!ENVIRONMENT_IS_WORKER) abort('Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc');
           var lazyArray = new LazyUint8Array();
           var properties = { isDevice: false, contents: lazyArray };
         } else {
@@ -4498,7 +4521,7 @@ async function createWasm() {
                     !isAsyncifyImport &&
                     !changedToDisabled &&
                     !ignoredInvoke) {
-                  throw new Error(`import ${x} was not in ASYNCIFY_IMPORTS, but changed the state`);
+                  abort(`import ${x} was not in ASYNCIFY_IMPORTS, but changed the state`);
                 }
               }
             };
@@ -5136,7 +5159,7 @@ async function createWasm() {
   
   
   
-  var UTF16Decoder = typeof TextDecoder != 'undefined' ? new TextDecoder('utf-16le') : undefined;;
+  var UTF16Decoder = globalThis.TextDecoder ? new TextDecoder('utf-16le') : undefined;;
   
   var UTF16ToString = (ptr, maxBytesToRead, ignoreNul) => {
       assert(ptr % 2 == 0, 'Pointer passed to UTF16ToString must be aligned to two bytes!');
@@ -5351,41 +5374,6 @@ async function createWasm() {
       }
     };
 
-  var _emscripten_get_now = () => performance.now();
-  
-  var _emscripten_date_now = () => Date.now();
-  
-  var nowIsMonotonic = 1;
-  
-  var checkWasiClock = (clock_id) => clock_id >= 0 && clock_id <= 3;
-  
-  var INT53_MAX = 9007199254740992;
-  
-  var INT53_MIN = -9007199254740992;
-  var bigintToI53Checked = (num) => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
-  function _clock_time_get(clk_id, ignored_precision, ptime) {
-    ignored_precision = bigintToI53Checked(ignored_precision);
-  
-  
-      if (!checkWasiClock(clk_id)) {
-        return 28;
-      }
-      var now;
-      // all wasi clocks but realtime are monotonic
-      if (clk_id === 0) {
-        now = _emscripten_date_now();
-      } else if (nowIsMonotonic) {
-        now = _emscripten_get_now();
-      } else {
-        return 52;
-      }
-      // "now" is in ms, and wasi times are in ns.
-      var nsec = Math.round(now * 1000 * 1000);
-      HEAP64[((ptime)>>3)] = BigInt(nsec);
-      return 0;
-    ;
-  }
-
   var _emscripten_err = (str) => err(UTF8ToString(str));
 
   var _emscripten_has_asyncify = () => 1;
@@ -5496,8 +5484,10 @@ async function createWasm() {
         };
         MainLoop.method = 'rAF';
       } else if (mode == 2) {
-        if (typeof MainLoop.setImmediate == 'undefined') {
-          if (typeof setImmediate == 'undefined') {
+        if (!MainLoop.setImmediate) {
+          if (globalThis.setImmediate) {
+            MainLoop.setImmediate = setImmediate;
+          } else {
             // Emulate setImmediate. (note: not a complete polyfill, we don't emulate clearImmediate() to keep code size to minimum, since not needed)
             var setImmediates = [];
             var emscriptenMainLoopMessageId = 'setimmediate';
@@ -5519,8 +5509,6 @@ async function createWasm() {
                 postMessage({target: emscriptenMainLoopMessageId}); // In --proxy-to-worker, route the message via proxyClient.js
               } else postMessage(emscriptenMainLoopMessageId, "*"); // On the main thread, can just send the message to itself.
             });
-          } else {
-            MainLoop.setImmediate = setImmediate;
           }
         }
         MainLoop.scheduler = function MainLoop_scheduler_setImmediate() {
@@ -5607,7 +5595,7 @@ async function createWasm() {
         setTimeout(func, delay);
       },
   requestAnimationFrame(func) {
-        if (typeof requestAnimationFrame == 'function') {
+        if (globalThis.requestAnimationFrame) {
           requestAnimationFrame(func);
         } else {
           MainLoop.fakeRequestAnimationFrame(func);
@@ -5616,6 +5604,7 @@ async function createWasm() {
   };
   
   
+  var _emscripten_get_now = () => performance.now();
   
   
     /**
@@ -6714,6 +6703,10 @@ async function createWasm() {
   },
   };
   
+  var INT53_MAX = 9007199254740992;
+  
+  var INT53_MIN = -9007199254740992;
+  var bigintToI53Checked = (num) => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
   function _emwgpuAdapterRequestDevice(adapterPtr, futureId, deviceLostFutureId, devicePtr, queuePtr, descriptor) {
     futureId = bigintToI53Checked(futureId);
     deviceLostFutureId = bigintToI53Checked(deviceLostFutureId);
@@ -7756,11 +7749,11 @@ async function createWasm() {
                 delta *= 80;
                 break;
               default:
-                throw 'unrecognized mouse wheel delta mode: ' + event.deltaMode;
+                abort('unrecognized mouse wheel delta mode: ' + event.deltaMode);
             }
             break;
           default:
-            throw 'unrecognized mouse wheel event: ' + event.type;
+            abort('unrecognized mouse wheel event: ' + event.type);
         }
         return delta;
       },
@@ -8438,7 +8431,7 @@ async function createWasm() {
         if (!GLFW.active) return;
   
         if (GLFW.active.windowContentScaleFunc) {
-          ((a1, a2, a3) => { throw 'Internal Error! Attempted to invoke wasm function pointer with signature "viff", but no such functions have gotten exported!' })(GLFW.active.id, GLFW.scale, GLFW.scale);
+          ((a1, a2, a3) => abort('Internal Error! Attempted to invoke wasm function pointer with signature "viff", but no such functions have gotten exported!'))(GLFW.active.id, GLFW.scale, GLFW.scale);
         }
       },
   getTime:() => _emscripten_get_now() / 1000,
@@ -8770,7 +8763,7 @@ async function createWasm() {
         for (i = 0; i < GLFW.windows.length && GLFW.windows[i] !== null; i++) {
           // no-op
         }
-        if (i > 0) throw "glfwCreateWindow only supports one window at time currently";
+        if (i > 0) abort("glfwCreateWindow only supports one window at time currently");
   
         // id for window
         id = i + 1;
@@ -9236,6 +9229,8 @@ async function createWasm() {
       win.windowFocusFunc = cbfun;
       return prevcbfun;
     };
+
+  var _glfwSetWindowSize = (winid, width, height) => GLFW.setWindowSize(winid, width, height);
 
   var _glfwSetWindowUserPointer = (winid, ptr) => {
       var win = GLFW.WindowFromId(winid);
@@ -9943,6 +9938,8 @@ async function createWasm() {
 
 
 
+  var requestFullscreen = Browser.requestFullscreen;
+
   var FS_createPath = (...args) => FS.createPath(...args);
 
 
@@ -10013,6 +10010,7 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
 // Begin runtime exports
   Module['addRunDependency'] = addRunDependency;
   Module['removeRunDependency'] = removeRunDependency;
+  Module['requestFullscreen'] = requestFullscreen;
   Module['FS_preloadFile'] = FS_preloadFile;
   Module['FS_unlink'] = FS_unlink;
   Module['FS_createPath'] = FS_createPath;
@@ -10101,6 +10099,7 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'jsStackTrace',
   'getCallstack',
   'convertPCtoSourceLocation',
+  'checkWasiClock',
   'wasiRightsToMuslOFlags',
   'wasiOFlagsToMuslOFlags',
   'setImmediateWrapped',
@@ -10180,7 +10179,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'makeLegalFunctionName',
   'count_emval_handles',
   'getStringOrSymbol',
-  'emval_get_global',
   'emval_returnValue',
   'emval_lookupTypes',
   'emval_addMethodCaller',
@@ -10214,6 +10212,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'stackSave',
   'stackRestore',
   'stackAlloc',
+  'createNamedFunction',
   'ptrToString',
   'exitJS',
   'getHeapMax',
@@ -10282,7 +10281,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'UNWIND_CACHE',
   'ExitStatus',
   'getEnvStrings',
-  'checkWasiClock',
   'doReadv',
   'doWritev',
   'initRandomFill',
@@ -10297,7 +10295,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'exceptionCaught',
   'ExceptionInfo',
   'Browser',
-  'requestFullscreen',
   'requestFullScreen',
   'setCanvasSize',
   'getUserMedia',
@@ -10484,7 +10481,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'ensureOverloadTable',
   'exposePublicSymbol',
   'replacePublicSymbol',
-  'createNamedFunction',
   'embindRepr',
   'registeredInstances',
   'registeredPointers',
@@ -10595,13 +10591,15 @@ var _asyncify_start_unwind = makeInvalidEarlyAccess('_asyncify_start_unwind');
 var _asyncify_stop_unwind = makeInvalidEarlyAccess('_asyncify_stop_unwind');
 var _asyncify_start_rewind = makeInvalidEarlyAccess('_asyncify_start_rewind');
 var _asyncify_stop_rewind = makeInvalidEarlyAccess('_asyncify_stop_rewind');
+var wasmMemory = makeInvalidEarlyAccess('wasmMemory');
+var wasmTable = makeInvalidEarlyAccess('wasmTable');
 
 function assignWasmExports(wasmExports) {
   ___getTypeName = createExportWrapper('__getTypeName', 1);
   _free = createExportWrapper('free', 1);
   _malloc = createExportWrapper('malloc', 1);
   _fflush = createExportWrapper('fflush', 1);
-  Module['_main'] = _main = createExportWrapper('main', 2);
+  _main = Module['_main'] = createExportWrapper('main', 2);
   _emwgpuCreateBindGroup = createExportWrapper('emwgpuCreateBindGroup', 1);
   _emwgpuCreateBindGroupLayout = createExportWrapper('emwgpuCreateBindGroupLayout', 1);
   _emwgpuCreateCommandBuffer = createExportWrapper('emwgpuCreateCommandBuffer', 1);
@@ -10642,36 +10640,39 @@ function assignWasmExports(wasmExports) {
   __emscripten_stack_restore = wasmExports['_emscripten_stack_restore'];
   __emscripten_stack_alloc = wasmExports['_emscripten_stack_alloc'];
   _emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'];
-  dynCalls['viiiii'] = dynCall_viiiii = createExportWrapper('dynCall_viiiii', 6);
-  dynCalls['ii'] = dynCall_ii = createExportWrapper('dynCall_ii', 2);
-  dynCalls['viii'] = dynCall_viii = createExportWrapper('dynCall_viii', 4);
-  dynCalls['viiiiii'] = dynCall_viiiiii = createExportWrapper('dynCall_viiiiii', 7);
-  dynCalls['iiiiii'] = dynCall_iiiiii = createExportWrapper('dynCall_iiiiii', 6);
-  dynCalls['vi'] = dynCall_vi = createExportWrapper('dynCall_vi', 2);
-  dynCalls['v'] = dynCall_v = createExportWrapper('dynCall_v', 1);
-  dynCalls['iiiiiii'] = dynCall_iiiiiii = createExportWrapper('dynCall_iiiiiii', 7);
-  dynCalls['iiii'] = dynCall_iiii = createExportWrapper('dynCall_iiii', 4);
-  dynCalls['vii'] = dynCall_vii = createExportWrapper('dynCall_vii', 3);
-  dynCalls['ff'] = dynCall_ff = createExportWrapper('dynCall_ff', 2);
-  dynCalls['vidd'] = dynCall_vidd = createExportWrapper('dynCall_vidd', 4);
-  dynCalls['viiii'] = dynCall_viiii = createExportWrapper('dynCall_viiii', 5);
-  dynCalls['iii'] = dynCall_iii = createExportWrapper('dynCall_iii', 3);
-  dynCalls['iiiii'] = dynCall_iiiii = createExportWrapper('dynCall_iiiii', 5);
-  dynCalls['iiiiiiii'] = dynCall_iiiiiiii = createExportWrapper('dynCall_iiiiiiii', 8);
-  dynCalls['viji'] = dynCall_viji = createExportWrapper('dynCall_viji', 4);
-  dynCalls['jiji'] = dynCall_jiji = createExportWrapper('dynCall_jiji', 4);
-  dynCalls['iidiiii'] = dynCall_iidiiii = createExportWrapper('dynCall_iidiiii', 7);
-  dynCalls['viijii'] = dynCall_viijii = createExportWrapper('dynCall_viijii', 6);
-  dynCalls['iiiiiiiii'] = dynCall_iiiiiiiii = createExportWrapper('dynCall_iiiiiiiii', 9);
-  dynCalls['iiiiij'] = dynCall_iiiiij = createExportWrapper('dynCall_iiiiij', 6);
-  dynCalls['iiiiid'] = dynCall_iiiiid = createExportWrapper('dynCall_iiiiid', 6);
-  dynCalls['iiiiijj'] = dynCall_iiiiijj = createExportWrapper('dynCall_iiiiijj', 7);
-  dynCalls['iiiiiijj'] = dynCall_iiiiiijj = createExportWrapper('dynCall_iiiiiijj', 8);
+  dynCall_viiiii = dynCalls['viiiii'] = createExportWrapper('dynCall_viiiii', 6);
+  dynCall_ii = dynCalls['ii'] = createExportWrapper('dynCall_ii', 2);
+  dynCall_viii = dynCalls['viii'] = createExportWrapper('dynCall_viii', 4);
+  dynCall_viiiiii = dynCalls['viiiiii'] = createExportWrapper('dynCall_viiiiii', 7);
+  dynCall_iiiiii = dynCalls['iiiiii'] = createExportWrapper('dynCall_iiiiii', 6);
+  dynCall_vi = dynCalls['vi'] = createExportWrapper('dynCall_vi', 2);
+  dynCall_v = dynCalls['v'] = createExportWrapper('dynCall_v', 1);
+  dynCall_iiiiiii = dynCalls['iiiiiii'] = createExportWrapper('dynCall_iiiiiii', 7);
+  dynCall_iiii = dynCalls['iiii'] = createExportWrapper('dynCall_iiii', 4);
+  dynCall_vii = dynCalls['vii'] = createExportWrapper('dynCall_vii', 3);
+  dynCall_ff = dynCalls['ff'] = createExportWrapper('dynCall_ff', 2);
+  dynCall_vidd = dynCalls['vidd'] = createExportWrapper('dynCall_vidd', 4);
+  dynCall_viiii = dynCalls['viiii'] = createExportWrapper('dynCall_viiii', 5);
+  dynCall_iii = dynCalls['iii'] = createExportWrapper('dynCall_iii', 3);
+  dynCall_iiiii = dynCalls['iiiii'] = createExportWrapper('dynCall_iiiii', 5);
+  dynCall_iiiiiiii = dynCalls['iiiiiiii'] = createExportWrapper('dynCall_iiiiiiii', 8);
+  dynCall_viji = dynCalls['viji'] = createExportWrapper('dynCall_viji', 4);
+  dynCall_jiji = dynCalls['jiji'] = createExportWrapper('dynCall_jiji', 4);
+  dynCall_iidiiii = dynCalls['iidiiii'] = createExportWrapper('dynCall_iidiiii', 7);
+  dynCall_viijii = dynCalls['viijii'] = createExportWrapper('dynCall_viijii', 6);
+  dynCall_iiiiiiiii = dynCalls['iiiiiiiii'] = createExportWrapper('dynCall_iiiiiiiii', 9);
+  dynCall_iiiiij = dynCalls['iiiiij'] = createExportWrapper('dynCall_iiiiij', 6);
+  dynCall_iiiiid = dynCalls['iiiiid'] = createExportWrapper('dynCall_iiiiid', 6);
+  dynCall_iiiiijj = dynCalls['iiiiijj'] = createExportWrapper('dynCall_iiiiijj', 7);
+  dynCall_iiiiiijj = dynCalls['iiiiiijj'] = createExportWrapper('dynCall_iiiiiijj', 8);
   _asyncify_start_unwind = createExportWrapper('asyncify_start_unwind', 1);
   _asyncify_stop_unwind = createExportWrapper('asyncify_stop_unwind', 0);
   _asyncify_start_rewind = createExportWrapper('asyncify_start_rewind', 1);
   _asyncify_stop_rewind = createExportWrapper('asyncify_stop_rewind', 0);
+  wasmMemory = wasmExports['memory'];
+  wasmTable = wasmExports['__indirect_function_table'];
 }
+
 var wasmImports = {
   /** @export */
   ImGui_ImplGlfw_EmscriptenOpenURL,
@@ -10709,8 +10710,6 @@ var wasmImports = {
   _embind_register_void: __embind_register_void,
   /** @export */
   _tzset_js: __tzset_js,
-  /** @export */
-  clock_time_get: _clock_time_get,
   /** @export */
   emscripten_err: _emscripten_err,
   /** @export */
@@ -10813,6 +10812,8 @@ var wasmImports = {
   glfwSetScrollCallback: _glfwSetScrollCallback,
   /** @export */
   glfwSetWindowFocusCallback: _glfwSetWindowFocusCallback,
+  /** @export */
+  glfwSetWindowSize: _glfwSetWindowSize,
   /** @export */
   glfwSetWindowUserPointer: _glfwSetWindowUserPointer,
   /** @export */
