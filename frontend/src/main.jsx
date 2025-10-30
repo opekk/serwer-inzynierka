@@ -1,31 +1,29 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './styles/index.css'
 import TestPage from './pages/TestPage.jsx'
 import MainPage from './pages/MainPage.jsx'
 import Auctions from './pages/Auctions.jsx'
 import AuctionView from './pages/AuctionView.jsx'
-
-function AppRouter() {
-  const path = window.location.pathname
-  if (path === '/main' || path === '') {
-    return <MainPage />
-  }
-  if (path === '/test') {
-    return <TestPage />
-  }
-
-  if (path === '/auctions') {
-    return <Auctions />
-  } 
-
-  if (path === '/auctionview') {
-    return <AuctionView />
-  }
-}
+import Viewer3D from './pages/Viewer3D.jsx'
+import { WebGPUCanvasProvider } from './components/WebGPUCanvasProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-   <AppRouter />
+    <BrowserRouter>
+  <WebGPUCanvasProvider>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/main" element={<MainPage />} />
+          <Route path="/test" element={<TestPage />} />
+          <Route path="/auctions" element={<Auctions />} />
+          <Route path="/auctionview" element={<AuctionView />} />
+          <Route path="/viewer3d" element={<Viewer3D />} />
+          <Route path="/3d" element={<Viewer3D />} />
+          <Route path="*" element={<MainPage />} />
+        </Routes>
+      </WebGPUCanvasProvider>
+    </BrowserRouter>
   </StrictMode>,
 )
