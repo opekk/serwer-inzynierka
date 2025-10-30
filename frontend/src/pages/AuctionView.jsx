@@ -31,9 +31,8 @@ export default function AuctionView() {
       {/* tu macie placeholderek ma model 3d */}
       {/* WebGPU 3D Canvas */}
       <div className="bg-black flex items-center justify-center p-4">
-        <WebGPUCanvas 
+        <WebGPUCanvas
           width={800}
-          height={600}
           showControls={true}
         />
       </div>

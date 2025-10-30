@@ -27,9 +27,8 @@ export default function Viewer3D() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex justify-center mb-6">
-            <WebGPUCanvas 
+            <WebGPUCanvas
               width={1024}
-              height={768}
               showControls={true}
               onModelChange={handleModelChange}
             />
