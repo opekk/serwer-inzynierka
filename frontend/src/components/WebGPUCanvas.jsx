@@ -4,6 +4,7 @@ import { useWebGPUCanvasInternal } from './WebGPUCanvasProvider.jsx'
 export default function WebGPUCanvas({
   width: widthProp,
   height: heightProp,
+  model,
   className = '',
   showControls = true,
   onModelChange = null
@@ -106,12 +107,13 @@ export default function WebGPUCanvas({
     attachSlot(slotIdRef.current, container, {
       width: normalizedWidth,
       height: normalizedHeight,
+      model,
       className,
       showControls,
       onModelChange,
       stretchToContainer
     })
-  }, [attachSlot, normalizedWidth, normalizedHeight, className, showControls, onModelChange, stretchToContainer])
+  }, [attachSlot, normalizedWidth, normalizedHeight, className, showControls, onModelChange, stretchToContainer, model])
 
   useEffect(() => {
     const slotId = slotIdRef.current
