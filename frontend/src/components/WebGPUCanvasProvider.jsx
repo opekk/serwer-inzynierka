@@ -215,10 +215,10 @@ function SharedWebGPUCanvas({
 
     if (!globalState.scriptAppended) {
       const script = document.createElement('script')
-      script.src = '/main_debug.js'
+      script.src = '/main.js'
       script.async = true
       script.onerror = () => {
-        console.error('Failed to load main_debug.js')
+        console.error('Failed to load main.js')
         setError('Failed to load WebAssembly runtime')
         setIsLoading(false)
       }
