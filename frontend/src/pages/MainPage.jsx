@@ -2,9 +2,28 @@ import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import WebGPUCanvas from '../components/WebGPUCanvas'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useWebGPUCanvas } from '../components/WebGPUCanvasProvider.jsx'
 
 export default function MainPage() {
+  const navigate = useNavigate()
+  const { changeModel } = useWebGPUCanvas()
+
+  const handleLicytuj = (modelName) => {
+    // Navigate immediately to avoid waiting for large model load.
+    navigate('/auctionview')
+    // Defer the actual model switch so routing transition is not delayed.
+    setTimeout(() => {
+      try {
+        const ok = typeof changeModel === 'function' ? changeModel(modelName) : false
+        if (!ok && typeof window !== 'undefined' && window.Module?.change_model) {
+          window.Module.change_model(modelName)
+        }
+      } catch (err) {
+        console.error('Deferred model change failed:', err)
+      }
+    }, 0)
+  }
   return (
     <div className="flex flex-col">
       <Navbar />
@@ -100,12 +119,12 @@ export default function MainPage() {
           <div className="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
             <h3 className="text-lg font-semibold">Przedmiot 1</h3>
             <p className="text-gray-500 mb-4">Dom aukcyjny 1</p>
-            <Link
-              to="/auctionview"
+            <button
+              onClick={() => handleLicytuj('fourareen')}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
             >
               Licytuj teraz
-            </Link>
+            </button>
           </div>  
           
 
@@ -113,8 +132,11 @@ export default function MainPage() {
           <div className="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
           <h3 className="text-lg font-semibold">Przedmiot 2</h3>
           <p className="text-gray-500 mb-4">Dom aukcyjny 2</p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg">
-          Licytuj teraz
+          <button
+            onClick={() => handleLicytuj('hunter')}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
+          >
+            Licytuj teraz
           </button>
         </div>
 
@@ -123,8 +145,11 @@ export default function MainPage() {
           <div className="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
           <h3 className="text-lg font-semibold">Przedmiot 3</h3>
           <p className="text-gray-500 mb-4">Dom aukcyjny 3</p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg">
-          Licytuj teraz
+          <button
+            onClick={() => handleLicytuj('snow')}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
+          >
+            Licytuj teraz
           </button>
         </div>
         </div>

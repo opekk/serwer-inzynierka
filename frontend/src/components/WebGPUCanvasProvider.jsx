@@ -191,6 +191,25 @@ function SharedWebGPUCanvas({
     const previousRuntimeInit = moduleConfig.onRuntimeInitialized
     const previousAbort = moduleConfig.onAbort
 
+    // Database / IDBFS
+    const DB_NAME = 'models.db'
+    moduleConfig.preRun = moduleConfig.preRun || []
+    moduleConfig.preRun.push(() => {
+      try {
+        const FSRef = (typeof globalThis !== 'undefined' && globalThis.FS) || (typeof window !== 'undefined' && window.FS)
+        const IDBFSRef = (typeof globalThis !== 'undefined' && globalThis.IDBFS) || (typeof window !== 'undefined' && window.IDBFS)
+        if (FSRef && IDBFSRef) {
+          if (!FSRef.analyzePath('/database').exists) {
+            FSRef.mkdir('/database')
+          }
+          // IDBFS mount (will persist between sessions)
+          FSRef.mount(IDBFSRef, {}, '/database')
+        }
+      } catch (err) {
+        console.error('IDBFS mount failed:', err)
+      }
+    })
+
     moduleConfig.canvas = canvas
     moduleConfig.onRuntimeInitialized = () => {
       previousRuntimeInit?.()
@@ -199,6 +218,53 @@ function SharedWebGPUCanvas({
       setIsLoading(false)
       setError(null)
       syncCanvasSizing()
+
+       // Sync IDBFS and seed database if needed.
+       try {
+         const FSRef = (typeof globalThis !== 'undefined' && globalThis.FS) || (typeof window !== 'undefined' && window.FS)
+         if (FSRef) {
+           FSRef.syncfs(true, () => {
+             try {
+               const destPath = `/database/${DB_NAME}`
+               const seedPath = `/seed/${DB_NAME}`
+               const destExists = FSRef.analyzePath(destPath).exists
+               const seedExists = FSRef.analyzePath(seedPath).exists
+
+               const writeAndPersist = (data) => {
+                 try {
+                   FSRef.writeFile(destPath, data)
+                   FSRef.syncfs(false, () => {})
+                   console.log(`[WebGPU] Seeded database ${DB_NAME} to IDBFS.`)
+                 } catch (e) {
+                   console.error('Writing seeded DB failed:', e)
+                 }
+               }
+
+               if (!destExists) {
+                 if (seedExists) {
+                   // Embedded via --preload-file
+                   const data = FSRef.readFile(seedPath)
+                   writeAndPersist(data)
+                 } else {
+                   // Fallback fetch from /seed/ served publicly
+                   fetch(`/seed/${DB_NAME}`)
+                     .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.statusText))) )
+                     .then((buf) => writeAndPersist(new Uint8Array(buf)))
+                     .catch((err) => {
+                       console.warn(`[WebGPU] No seed database found at /seed/${DB_NAME}:`, err)
+                     })
+                 }
+               } else {
+                 console.log(`[WebGPU] Existing database found: ${destPath}`)
+               }
+             } catch (seedErr) {
+               console.error('Database seed logic error:', seedErr)
+             }
+           })
+         }
+       } catch (syncErr) {
+         console.error('IDBFS sync/seed failed:', syncErr)
+       }
     }
     moduleConfig.onAbort = (what) => {
       previousAbort?.(what)

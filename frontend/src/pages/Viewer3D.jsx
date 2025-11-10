@@ -58,7 +58,7 @@ export default function Viewer3D() {
               📦 Aktualny model
             </h3>
             <p className="text-gray-600 text-sm">
-              Załadowano: <span className="font-mono font-semibold text-indigo-600">{selectedModel}</span>
+              Załadowano: <span className="font-mono font-semibold text-indigo-600">fourareen</span>
             </p>
           </div>
         </div>
