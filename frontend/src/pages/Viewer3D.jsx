@@ -2,14 +2,8 @@ import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import WebGPUCanvas from '../components/WebGPUCanvas'
-import { useState } from 'react'
 
 export default function Viewer3D() {
-  const [selectedModel, setSelectedModel] = useState('fourareen')
-
-  const handleModelChange = (modelName) => {
-    setSelectedModel(modelName)
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -28,9 +22,9 @@ export default function Viewer3D() {
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex justify-center mb-6">
             <WebGPUCanvas
+              model="fourareen"
               width={1024}
-              showControls={true}
-              onModelChange={handleModelChange}
+              showControls={false}
             />
           </div>
         </div>

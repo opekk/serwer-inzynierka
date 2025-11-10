@@ -106,19 +106,16 @@ function applyCanvasSizing(canvas, cssWidth, cssHeight, intrinsicWidth, intrinsi
 
 function SharedWebGPUCanvas({
   options,
-  modelNames,
   isLoading,
   setIsLoading,
   error,
   setError,
   moduleReady,
-  setModuleReady,
-  currentModel,
-  changeModel
+  setModuleReady
 }) {
   const canvasRef = useRef(null)
   const initRef = useRef(false)
-  const { width, height, className, showControls } = options
+  const { width, height, className } = options
 
   const syncCanvasSizing = useCallback(() => {
     const canvas = canvasRef.current
@@ -139,7 +136,7 @@ function SharedWebGPUCanvas({
         console.error('Module.resize_canvas failed:', err)
       }
     }
-  }, [height, width])
+  }, [width, height])
 
   useEffect(() => {
     syncCanvasSizing()
@@ -266,24 +263,7 @@ function SharedWebGPUCanvas({
         )}
       </div>
 
-      {showControls && moduleReady && (
-        <div className="mt-4 text-center space-x-2">
-          {modelNames.map((name) => (
-            <button
-              key={name}
-              onClick={() => changeModel(name)}
-              disabled={!moduleReady || isLoading || currentModel === name}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                currentModel === name
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Model switcher removed (demo only). */}
     </div>
   )
 }
@@ -469,15 +449,12 @@ export function WebGPUCanvasProvider({ children }) {
         ? createPortal(
             <SharedWebGPUCanvas
               options={presentationOptions}
-              modelNames={MODEL_NAMES}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
               error={error}
               setError={setError}
               moduleReady={moduleReady}
               setModuleReady={setModuleReady}
-              currentModel={currentModel}
-              changeModel={changeModel}
             />,
             hostNode
           )
