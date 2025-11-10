@@ -64,16 +64,16 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\Konrad\AppData\Local\Temp\tmp264k7biy.js
+// include: C:\Users\Konrad\AppData\Local\Temp\tmplgh60c22.js
 
-  Module['expectedDataFileDownloads'] ??= 0;
+  if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
   (() => {
     // Do not attempt to redownload the virtual filesystem data when in a pthread or a Wasm Worker context.
     var isPthread = typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD;
     var isWasmWorker = typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER;
     if (isPthread || isWasmWorker) return;
-    var isNode = globalThis.process?.versions?.node && globalThis.process?.type != 'renderer';
+    var isNode = globalThis.process && globalThis.process.versions && globalThis.process.versions.node && globalThis.process.type != 'renderer';
     async function loadPackage(metadata) {
 
       var PACKAGE_PATH = '';
@@ -85,16 +85,15 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
       }
       var PACKAGE_NAME = 'bin/debug/main_debug.data';
       var REMOTE_PACKAGE_BASE = 'main_debug.data';
-      var REMOTE_PACKAGE_NAME = Module['locateFile']?.(REMOTE_PACKAGE_BASE, '') ?? REMOTE_PACKAGE_BASE;
+      var REMOTE_PACKAGE_NAME = Module['locateFile'] ? Module['locateFile'](REMOTE_PACKAGE_BASE, '') : REMOTE_PACKAGE_BASE;
       var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
 
       async function fetchRemotePackage(packageName, packageSize) {
         if (isNode) {
-          var fsPromises = require('fs/promises');
-          var contents = await fsPromises.readFile(packageName);
-          return contents.buffer;
+          var contents = require('fs').readFileSync(packageName);
+          return new Uint8Array(contents).buffer;
         }
-        Module['dataFileDownloads'] ??= {};
+        if (!Module['dataFileDownloads']) Module['dataFileDownloads'] = {};
         try {
           var response = await fetch(packageName);
         } catch (e) {
@@ -106,10 +105,10 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
         const chunks = [];
         const headers = response.headers;
-        const total = Number(headers.get('Content-Length') ?? packageSize);
+        const total = Number(headers.get('Content-Length') || packageSize);
         let loaded = 0;
 
-        Module['setStatus']?.('Downloading data...');
+        Module['setStatus'] && Module['setStatus']('Downloading data...');
         const reader = response.body.getReader();
 
         while (1) {
@@ -127,7 +126,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
             totalSize += download.total;
           }
 
-          Module['setStatus']?.(`Downloading data... (${totalLoaded}/${totalSize})`);
+          Module['setStatus'] && Module['setStatus'](`Downloading data... (${totalLoaded}/${totalSize})`);
         }
 
         const packageData = new Uint8Array(chunks.map((c) => c.length).reduce((a, b) => a + b, 0));
@@ -157,7 +156,14 @@ Module['FS_createPath']("/", "D:", true, true);
 Module['FS_createPath']("/D:", "code", true, true);
 Module['FS_createPath']("/D:/code", "WebGPU", true, true);
 Module['FS_createPath']("/D:/code/WebGPU", "inz", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz", "database", true, true);
 Module['FS_createPath']("/D:/code/WebGPU/inz", "resources", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz/resources", "andersen", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz/resources", "candle-holder", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz/resources", "fourareen", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz/resources", "hey-zeus", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz/resources", "hunter", true, true);
+Module['FS_createPath']("/D:/code/WebGPU/inz/resources", "snow", true, true);
 
       for (var file of metadata['files']) {
         var name = file['filename']
@@ -166,7 +172,7 @@ Module['FS_createPath']("/D:/code/WebGPU/inz", "resources", true, true);
 
       async function processPackageData(arrayBuffer) {
         assert(arrayBuffer, 'Loading data file failed.');
-        assert(arrayBuffer.constructor.name === ArrayBuffer.name, 'bad input to processPackageData');
+        assert(arrayBuffer.constructor.name === ArrayBuffer.name, 'bad input to processPackageData ' + arrayBuffer.constructor.name);
         var byteArray = new Uint8Array(arrayBuffer);
         var curr;
         // Reuse the bytearray from the XHR as the source for file reads.
@@ -181,7 +187,7 @@ Module['FS_createPath']("/D:/code/WebGPU/inz", "resources", true, true);
       }
       Module['addRunDependency']('datafile_bin/debug/main_debug.data');
 
-      Module['preloadResults'] ??= {};
+      if (!Module['preloadResults']) Module['preloadResults'] = {};
 
       Module['preloadResults'][PACKAGE_NAME] = {fromCache: false};
       if (!fetched) {
@@ -193,29 +199,30 @@ Module['FS_createPath']("/D:/code/WebGPU/inz", "resources", true, true);
     if (Module['calledRun']) {
       runWithFS(Module);
     } else {
-      (Module['preRun'] ??= []).push(runWithFS); // FS is not initialized yet, wait for it
+      if (!Module['preRun']) Module['preRun'] = [];
+      Module['preRun'].push(runWithFS); // FS is not initialized yet, wait for it
     }
 
     }
-    loadPackage({"files": [{"filename": "D:/code/WebGPU/inz/resources/autumn_park_4k.jpg", "start": 0, "end": 476532}, {"filename": "D:/code/WebGPU/inz/resources/cobblestone_floor_08_diff_2k.jpg", "start": 476532, "end": 2766441}, {"filename": "D:/code/WebGPU/inz/resources/cobblestone_floor_08_nor_gl_2k.png", "start": 2766441, "end": 11146871}, {"filename": "D:/code/WebGPU/inz/resources/cube.obj", "start": 11146871, "end": 11147782}, {"filename": "D:/code/WebGPU/inz/resources/cylinder.obj", "start": 11147782, "end": 11151048}, {"filename": "D:/code/WebGPU/inz/resources/fourareen.mtl", "start": 11151048, "end": 11151356}, {"filename": "D:/code/WebGPU/inz/resources/fourareen.obj", "start": 11151356, "end": 16243091}, {"filename": "D:/code/WebGPU/inz/resources/fourareen2K_albedo.jpg", "start": 16243091, "end": 17647773}, {"filename": "D:/code/WebGPU/inz/resources/fourareen2K_normals.png", "start": 17647773, "end": 23027957}, {"filename": "D:/code/WebGPU/inz/resources/mammoth.obj", "start": 23027957, "end": 38894513}, {"filename": "D:/code/WebGPU/inz/resources/plane.obj", "start": 38894513, "end": 38894815}, {"filename": "D:/code/WebGPU/inz/resources/pyramid.obj", "start": 38894815, "end": 38902727}, {"filename": "D:/code/WebGPU/inz/resources/pyramid.txt", "start": 38902727, "end": 38903812}, {"filename": "D:/code/WebGPU/inz/resources/shader.wgsl", "start": 38903812, "end": 38907454}, {"filename": "D:/code/WebGPU/inz/resources/texture.jpg", "start": 38907454, "end": 41197363}, {"filename": "D:/code/WebGPU/inz/resources/webgpu.txt", "start": 41197363, "end": 41197899}], "remote_package_size": 41197899});
+    loadPackage({"files": [{"filename": "D:/code/WebGPU/inz/database/models.db", "start": 0, "end": 12288}, {"filename": "D:/code/WebGPU/inz/resources/andersen/HansChristianAndersen-80k.obj", "start": 12288, "end": 7276818}, {"filename": "D:/code/WebGPU/inz/resources/andersen/HansChristianAndersen_gloss.jpg", "start": 7276818, "end": 19052603}, {"filename": "D:/code/WebGPU/inz/resources/andersen/hans_low80-tex_u1_v1_normal.jpg", "start": 19052603, "end": 28197135}, {"filename": "D:/code/WebGPU/inz/resources/andersen/hansdiff.jpg", "start": 28197135, "end": 36503545}, {"filename": "D:/code/WebGPU/inz/resources/autumn_park_4k.jpg", "start": 36503545, "end": 36980077}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Gold_Candle_Statue_candle_BaseColor.png", "start": 36980077, "end": 58321055}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Gold_Candle_Statue_candle_Height.png", "start": 58321055, "end": 63947103}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Gold_Candle_Statue_candle_Metallic.png", "start": 63947103, "end": 71723403}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Gold_Candle_Statue_candle_Normal.png", "start": 71723403, "end": 98725871}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Gold_Candle_Statue_candle_Roughness.png", "start": 98725871, "end": 101386156}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Pagan_CandleHolder_Statue_FBX.fbx", "start": 101386156, "end": 101510252}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Pagan_CandleHolder_Statue_FBX.mtl", "start": 101510252, "end": 101510458}, {"filename": "D:/code/WebGPU/inz/resources/candle-holder/Pagan_CandleHolder_Statue_FBX.obj", "start": 101510458, "end": 103250277}, {"filename": "D:/code/WebGPU/inz/resources/cobblestone_floor_08_diff_2k.jpg", "start": 103250277, "end": 105540186}, {"filename": "D:/code/WebGPU/inz/resources/cobblestone_floor_08_nor_gl_2k.png", "start": 105540186, "end": 113920616}, {"filename": "D:/code/WebGPU/inz/resources/cube.obj", "start": 113920616, "end": 113921527}, {"filename": "D:/code/WebGPU/inz/resources/cylinder.obj", "start": 113921527, "end": 113924793}, {"filename": "D:/code/WebGPU/inz/resources/fourareen/fourareen.mtl", "start": 113924793, "end": 113925101}, {"filename": "D:/code/WebGPU/inz/resources/fourareen/fourareen.obj", "start": 113925101, "end": 119016836}, {"filename": "D:/code/WebGPU/inz/resources/fourareen/fourareen2K_albedo.jpg", "start": 119016836, "end": 120421518}, {"filename": "D:/code/WebGPU/inz/resources/fourareen/fourareen2K_normals.png", "start": 120421518, "end": 125801702}, {"filename": "D:/code/WebGPU/inz/resources/hey-zeus/HeyZues.330cam.N.8ktex_Material_u1_v1.png", "start": 125801702, "end": 141851185}, {"filename": "D:/code/WebGPU/inz/resources/hey-zeus/HeyZues.330cam.N.jpeg", "start": 141851185, "end": 143262854}, {"filename": "D:/code/WebGPU/inz/resources/hey-zeus/Sketchfab_2017_02_19_21_42_08.blend", "start": 143262854, "end": 160336466}, {"filename": "D:/code/WebGPU/inz/resources/hey-zeus/Sketchfab_2017_02_19_21_42_08.mtl", "start": 160336466, "end": 160336713}, {"filename": "D:/code/WebGPU/inz/resources/hey-zeus/Sketchfab_2017_02_19_21_42_08.obj", "start": 160336713, "end": 341746815}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100k.mtl", "start": 341746815, "end": 341747189}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw.obj", "start": 341747189, "end": 350972428}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw_DiffuseMap.jpg", "start": 350972428, "end": 357310640}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw_NormalsMap.jpg", "start": 357310640, "end": 371697346}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw_Roughness.jpg", "start": 371697346, "end": 374680568}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw_albedo.jpg", "start": 374680568, "end": 381351866}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw_ao.jpg", "start": 381351866, "end": 389306025}, {"filename": "D:/code/WebGPU/inz/resources/hunter/socha_100kuw_concave.jpg", "start": 389306025, "end": 396541663}, {"filename": "D:/code/WebGPU/inz/resources/mammoth.obj", "start": 396541663, "end": 412408219}, {"filename": "D:/code/WebGPU/inz/resources/plane.obj", "start": 412408219, "end": 412408521}, {"filename": "D:/code/WebGPU/inz/resources/pyramid.obj", "start": 412408521, "end": 412416433}, {"filename": "D:/code/WebGPU/inz/resources/pyramid.txt", "start": 412416433, "end": 412417518}, {"filename": "D:/code/WebGPU/inz/resources/shader.wgsl", "start": 412417518, "end": 412421160}, {"filename": "D:/code/WebGPU/inz/resources/snow/snow.obj", "start": 412421160, "end": 414963701}, {"filename": "D:/code/WebGPU/inz/resources/snow/snow_default_ao.jpg", "start": 414963701, "end": 415966988}, {"filename": "D:/code/WebGPU/inz/resources/snow/snow_default_color.jpg", "start": 415966988, "end": 417444389}, {"filename": "D:/code/WebGPU/inz/resources/snow/snow_default_curvature.jpg", "start": 417444389, "end": 418870396}, {"filename": "D:/code/WebGPU/inz/resources/snow/snow_default_nmap.jpg", "start": 418870396, "end": 420485292}, {"filename": "D:/code/WebGPU/inz/resources/snow/snow_default_rough.jpg", "start": 420485292, "end": 423846404}, {"filename": "D:/code/WebGPU/inz/resources/texture.jpg", "start": 423846404, "end": 426136313}, {"filename": "D:/code/WebGPU/inz/resources/webgpu.txt", "start": 426136313, "end": 426136849}], "remote_package_size": 426136849});
 
   })();
 
-// end include: C:\Users\Konrad\AppData\Local\Temp\tmp264k7biy.js
-// include: C:\Users\Konrad\AppData\Local\Temp\tmpxs1wrilv.js
+// end include: C:\Users\Konrad\AppData\Local\Temp\tmplgh60c22.js
+// include: C:\Users\Konrad\AppData\Local\Temp\tmpvc9arefl.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpxs1wrilv.js
-// include: C:\Users\Konrad\AppData\Local\Temp\tmpiyfd599n.js
+  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpvc9arefl.js
+// include: C:\Users\Konrad\AppData\Local\Temp\tmpxwfrdblq.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpiyfd599n.js
+  // end include: C:\Users\Konrad\AppData\Local\Temp\tmpxwfrdblq.js
 
 
 var arguments_ = [];
@@ -357,7 +364,7 @@ if (ENVIRONMENT_IS_WORKER) {
 var out = console.log.bind(console);
 var err = console.error.bind(console);
 
-var IDBFS = 'IDBFS is no longer included by default; build with -lidbfs.js';
+
 var PROXYFS = 'PROXYFS is no longer included by default; build with -lproxyfs.js';
 var WORKERFS = 'WORKERFS is no longer included by default; build with -lworkerfs.js';
 var FETCHFS = 'FETCHFS is no longer included by default; build with -lfetchfs.js';
@@ -747,7 +754,7 @@ function createExportWrapper(name, nargs) {
 var wasmBinaryFile;
 
 function findWasmBinary() {
-    return locateFile('main_debug.wasm');
+  return locateFile('main_debug.wasm');
 }
 
 function getBinarySync(file) {
@@ -827,10 +834,11 @@ function getWasmImports() {
   // the Promise API on the import side.
   Asyncify.instrumentWasmImports(wasmImports);
   // prepare imports
-  return {
+  var imports = {
     'env': wasmImports,
     'wasi_snapshot_preview1': wasmImports,
-  }
+  };
+  return imports;
 }
 
 // Create the wasm instance.
@@ -844,8 +852,6 @@ async function createWasm() {
     wasmExports = instance.exports;
 
     wasmExports = Asyncify.instrumentWasmExports(wasmExports);
-
-    
 
     assignWasmExports(wasmExports);
 
@@ -1006,6 +1012,7 @@ async function createWasm() {
       return f(ptr, ...args);
     };
   var dynCall = (sig, ptr, args = [], promising = false) => {
+      assert(ptr, `null function pointer in dynCall`);
       assert(!promising, 'async dynCall is not supported in this mode')
       var rtn = dynCallLegacy(sig, ptr, args);
   
@@ -1079,6 +1086,8 @@ async function createWasm() {
         err(text);
       }
     };
+
+  
 
   var UTF8Decoder = globalThis.TextDecoder && new TextDecoder();
   
@@ -1229,17 +1238,6 @@ async function createWasm() {
       assert(false, 'Exception thrown, but exception catching is not enabled. Compile with -sNO_DISABLE_EXCEPTION_CATCHING or -sEXCEPTION_CATCHING_ALLOWED=[..] to catch.');
     };
 
-  /** @suppress {duplicate } */
-  var syscallGetVarargI = () => {
-      assert(SYSCALLS.varargs != undefined);
-      // the `+` prepended here is necessary to convince the JSCompiler that varargs is indeed a number.
-      var ret = HEAP32[((+SYSCALLS.varargs)>>2)];
-      SYSCALLS.varargs += 4;
-      return ret;
-    };
-  var syscallGetVarargP = syscallGetVarargI;
-  
-  
   var PATH = {
   isAbs:(path) => path.charAt(0) === '/',
   splitPath:(filename) => {
@@ -1636,8 +1634,17 @@ async function createWasm() {
   };
   
   
+  var zeroMemory = (ptr, size) => HEAPU8.fill(0, ptr, ptr + size);
+  
+  var alignMemory = (size, alignment) => {
+      assert(alignment, "alignment argument is required");
+      return Math.ceil(size / alignment) * alignment;
+    };
   var mmapAlloc = (size) => {
-      abort('internal error: mmapAlloc called but `emscripten_builtin_memalign` native symbol not exported');
+      size = alignMemory(size, 65536);
+      var ptr = _emscripten_builtin_memalign(65536, size);
+      if (ptr) zeroMemory(ptr, size);
+      return ptr;
     };
   var MEMFS = {
   ops_table:null,
@@ -1982,6 +1989,378 @@ async function createWasm() {
       return mode;
     };
   
+  
+  
+  
+  var IDBFS = {
+  dbs:{
+  },
+  indexedDB:() => {
+        assert(typeof indexedDB != 'undefined', 'IDBFS used, but indexedDB not supported');
+        return indexedDB;
+      },
+  DB_VERSION:21,
+  DB_STORE_NAME:"FILE_DATA",
+  queuePersist:(mount) => {
+        function onPersistComplete() {
+          if (mount.idbPersistState === 'again') startPersist(); // If a new sync request has appeared in between, kick off a new sync
+          else mount.idbPersistState = 0; // Otherwise reset sync state back to idle to wait for a new sync later
+        }
+        function startPersist() {
+          mount.idbPersistState = 'idb'; // Mark that we are currently running a sync operation
+          IDBFS.syncfs(mount, /*populate:*/false, onPersistComplete);
+        }
+  
+        if (!mount.idbPersistState) {
+          // Programs typically write/copy/move multiple files in the in-memory
+          // filesystem within a single app frame, so when a filesystem sync
+          // command is triggered, do not start it immediately, but only after
+          // the current frame is finished. This way all the modified files
+          // inside the main loop tick will be batched up to the same sync.
+          mount.idbPersistState = setTimeout(startPersist, 0);
+        } else if (mount.idbPersistState === 'idb') {
+          // There is an active IndexedDB sync operation in-flight, but we now
+          // have accumulated more files to sync. We should therefore queue up
+          // a new sync after the current one finishes so that all writes
+          // will be properly persisted.
+          mount.idbPersistState = 'again';
+        }
+      },
+  mount:(mount) => {
+        // reuse core MEMFS functionality
+        var mnt = MEMFS.mount(mount);
+        // If the automatic IDBFS persistence option has been selected, then automatically persist
+        // all modifications to the filesystem as they occur.
+        if (mount?.opts?.autoPersist) {
+          mount.idbPersistState = 0; // IndexedDB sync starts in idle state
+          var memfs_node_ops = mnt.node_ops;
+          mnt.node_ops = {...mnt.node_ops}; // Clone node_ops to inject write tracking
+          mnt.node_ops.mknod = (parent, name, mode, dev) => {
+            var node = memfs_node_ops.mknod(parent, name, mode, dev);
+            // Propagate injected node_ops to the newly created child node
+            node.node_ops = mnt.node_ops;
+            // Remember for each IDBFS node which IDBFS mount point they came from so we know which mount to persist on modification.
+            node.idbfs_mount = mnt.mount;
+            // Remember original MEMFS stream_ops for this node
+            node.memfs_stream_ops = node.stream_ops;
+            // Clone stream_ops to inject write tracking
+            node.stream_ops = {...node.stream_ops};
+  
+            // Track all file writes
+            node.stream_ops.write = (stream, buffer, offset, length, position, canOwn) => {
+              // This file has been modified, we must persist IndexedDB when this file closes
+              stream.node.isModified = true;
+              return node.memfs_stream_ops.write(stream, buffer, offset, length, position, canOwn);
+            };
+  
+            // Persist IndexedDB on file close
+            node.stream_ops.close = (stream) => {
+              var n = stream.node;
+              if (n.isModified) {
+                IDBFS.queuePersist(n.idbfs_mount);
+                n.isModified = false;
+              }
+              if (n.memfs_stream_ops.close) return n.memfs_stream_ops.close(stream);
+            };
+  
+            // Persist the node we just created to IndexedDB
+            IDBFS.queuePersist(mnt.mount);
+  
+            return node;
+          };
+          // Also kick off persisting the filesystem on other operations that modify the filesystem.
+          mnt.node_ops.rmdir   = (...args) => (IDBFS.queuePersist(mnt.mount), memfs_node_ops.rmdir(...args));
+          mnt.node_ops.symlink = (...args) => (IDBFS.queuePersist(mnt.mount), memfs_node_ops.symlink(...args));
+          mnt.node_ops.unlink  = (...args) => (IDBFS.queuePersist(mnt.mount), memfs_node_ops.unlink(...args));
+          mnt.node_ops.rename  = (...args) => (IDBFS.queuePersist(mnt.mount), memfs_node_ops.rename(...args));
+        }
+        return mnt;
+      },
+  syncfs:(mount, populate, callback) => {
+        IDBFS.getLocalSet(mount, (err, local) => {
+          if (err) return callback(err);
+  
+          IDBFS.getRemoteSet(mount, (err, remote) => {
+            if (err) return callback(err);
+  
+            var src = populate ? remote : local;
+            var dst = populate ? local : remote;
+  
+            IDBFS.reconcile(src, dst, callback);
+          });
+        });
+      },
+  quit:() => {
+        Object.values(IDBFS.dbs).forEach((value) => value.close());
+        IDBFS.dbs = {};
+      },
+  getDB:(name, callback) => {
+        // check the cache first
+        var db = IDBFS.dbs[name];
+        if (db) {
+          return callback(null, db);
+        }
+  
+        var req;
+        try {
+          req = IDBFS.indexedDB().open(name, IDBFS.DB_VERSION);
+        } catch (e) {
+          return callback(e);
+        }
+        if (!req) {
+          return callback("Unable to connect to IndexedDB");
+        }
+        req.onupgradeneeded = (e) => {
+          var db = /** @type {IDBDatabase} */ (e.target.result);
+          var transaction = e.target.transaction;
+  
+          var fileStore;
+  
+          if (db.objectStoreNames.contains(IDBFS.DB_STORE_NAME)) {
+            fileStore = transaction.objectStore(IDBFS.DB_STORE_NAME);
+          } else {
+            fileStore = db.createObjectStore(IDBFS.DB_STORE_NAME);
+          }
+  
+          if (!fileStore.indexNames.contains('timestamp')) {
+            fileStore.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+        };
+        req.onsuccess = () => {
+          db = /** @type {IDBDatabase} */ (req.result);
+  
+          // add to the cache
+          IDBFS.dbs[name] = db;
+          callback(null, db);
+        };
+        req.onerror = (e) => {
+          callback(e.target.error);
+          e.preventDefault();
+        };
+      },
+  getLocalSet:(mount, callback) => {
+        var entries = {};
+  
+        function isRealDir(p) {
+          return p !== '.' && p !== '..';
+        };
+        function toAbsolute(root) {
+          return (p) => PATH.join2(root, p);
+        };
+  
+        var check = FS.readdir(mount.mountpoint).filter(isRealDir).map(toAbsolute(mount.mountpoint));
+  
+        while (check.length) {
+          var path = check.pop();
+          var stat;
+  
+          try {
+            stat = FS.stat(path);
+          } catch (e) {
+            return callback(e);
+          }
+  
+          if (FS.isDir(stat.mode)) {
+            check.push(...FS.readdir(path).filter(isRealDir).map(toAbsolute(path)));
+          }
+  
+          entries[path] = { 'timestamp': stat.mtime };
+        }
+  
+        return callback(null, { type: 'local', entries: entries });
+      },
+  getRemoteSet:(mount, callback) => {
+        var entries = {};
+  
+        IDBFS.getDB(mount.mountpoint, (err, db) => {
+          if (err) return callback(err);
+  
+          try {
+            var transaction = db.transaction([IDBFS.DB_STORE_NAME], 'readonly');
+            transaction.onerror = (e) => {
+              callback(e.target.error);
+              e.preventDefault();
+            };
+  
+            var store = transaction.objectStore(IDBFS.DB_STORE_NAME);
+            var index = store.index('timestamp');
+  
+            index.openKeyCursor().onsuccess = (event) => {
+              var cursor = event.target.result;
+  
+              if (!cursor) {
+                return callback(null, { type: 'remote', db, entries });
+              }
+  
+              entries[cursor.primaryKey] = { 'timestamp': cursor.key };
+  
+              cursor.continue();
+            };
+          } catch (e) {
+            return callback(e);
+          }
+        });
+      },
+  loadLocalEntry:(path, callback) => {
+        var stat, node;
+  
+        try {
+          var lookup = FS.lookupPath(path);
+          node = lookup.node;
+          stat = FS.stat(path);
+        } catch (e) {
+          return callback(e);
+        }
+  
+        if (FS.isDir(stat.mode)) {
+          return callback(null, { 'timestamp': stat.mtime, 'mode': stat.mode });
+        } else if (FS.isFile(stat.mode)) {
+          // Performance consideration: storing a normal JavaScript array to a IndexedDB is much slower than storing a typed array.
+          // Therefore always convert the file contents to a typed array first before writing the data to IndexedDB.
+          node.contents = MEMFS.getFileDataAsTypedArray(node);
+          return callback(null, { 'timestamp': stat.mtime, 'mode': stat.mode, 'contents': node.contents });
+        } else {
+          return callback(new Error('node type not supported'));
+        }
+      },
+  storeLocalEntry:(path, entry, callback) => {
+        try {
+          if (FS.isDir(entry['mode'])) {
+            FS.mkdirTree(path, entry['mode']);
+          } else if (FS.isFile(entry['mode'])) {
+            FS.writeFile(path, entry['contents'], { canOwn: true });
+          } else {
+            return callback(new Error('node type not supported'));
+          }
+  
+          FS.chmod(path, entry['mode']);
+          FS.utime(path, entry['timestamp'], entry['timestamp']);
+        } catch (e) {
+          return callback(e);
+        }
+  
+        callback(null);
+      },
+  removeLocalEntry:(path, callback) => {
+        try {
+          var stat = FS.stat(path);
+  
+          if (FS.isDir(stat.mode)) {
+            FS.rmdir(path);
+          } else if (FS.isFile(stat.mode)) {
+            FS.unlink(path);
+          }
+        } catch (e) {
+          return callback(e);
+        }
+  
+        callback(null);
+      },
+  loadRemoteEntry:(store, path, callback) => {
+        var req = store.get(path);
+        req.onsuccess = (event) => callback(null, event.target.result);
+        req.onerror = (e) => {
+          callback(e.target.error);
+          e.preventDefault();
+        };
+      },
+  storeRemoteEntry:(store, path, entry, callback) => {
+        try {
+          var req = store.put(entry, path);
+        } catch (e) {
+          callback(e);
+          return;
+        }
+        req.onsuccess = (event) => callback();
+        req.onerror = (e) => {
+          callback(e.target.error);
+          e.preventDefault();
+        };
+      },
+  removeRemoteEntry:(store, path, callback) => {
+        var req = store.delete(path);
+        req.onsuccess = (event) => callback();
+        req.onerror = (e) => {
+          callback(e.target.error);
+          e.preventDefault();
+        };
+      },
+  reconcile:(src, dst, callback) => {
+        var total = 0;
+  
+        var create = [];
+        Object.keys(src.entries).forEach((key) => {
+          var e = src.entries[key];
+          var e2 = dst.entries[key];
+          if (!e2 || e['timestamp'].getTime() != e2['timestamp'].getTime()) {
+            create.push(key);
+            total++;
+          }
+        });
+  
+        var remove = [];
+        Object.keys(dst.entries).forEach((key) => {
+          if (!src.entries[key]) {
+            remove.push(key);
+            total++;
+          }
+        });
+  
+        if (!total) {
+          return callback(null);
+        }
+  
+        var errored = false;
+        var db = src.type === 'remote' ? src.db : dst.db;
+        var transaction = db.transaction([IDBFS.DB_STORE_NAME], 'readwrite');
+        var store = transaction.objectStore(IDBFS.DB_STORE_NAME);
+  
+        function done(err) {
+          if (err && !errored) {
+            errored = true;
+            return callback(err);
+          }
+        };
+  
+        // transaction may abort if (for example) there is a QuotaExceededError
+        transaction.onerror = transaction.onabort = (e) => {
+          done(e.target.error);
+          e.preventDefault();
+        };
+  
+        transaction.oncomplete = (e) => {
+          if (!errored) {
+            callback(null);
+          }
+        };
+  
+        // sort paths in ascending order so directory entries are created
+        // before the files inside them
+        create.sort().forEach((path) => {
+          if (dst.type === 'local') {
+            IDBFS.loadRemoteEntry(store, path, (err, entry) => {
+              if (err) return done(err);
+              IDBFS.storeLocalEntry(path, entry, done);
+            });
+          } else {
+            IDBFS.loadLocalEntry(path, (err, entry) => {
+              if (err) return done(err);
+              IDBFS.storeRemoteEntry(store, path, entry, done);
+            });
+          }
+        });
+  
+        // sort paths in descending order so files are deleted before their
+        // parent directories
+        remove.sort().reverse().forEach((path) => {
+          if (dst.type === 'local') {
+            IDBFS.removeLocalEntry(path, done);
+          } else {
+            IDBFS.removeRemoteEntry(store, path, done);
+          }
+        });
+      },
+  };
   
   
   
@@ -3481,6 +3860,7 @@ async function createWasm() {
   
         FS.filesystems = {
           'MEMFS': MEMFS,
+          'IDBFS': IDBFS,
         };
       },
   init(input, output, error) {
@@ -3908,6 +4288,112 @@ async function createWasm() {
         return ret;
       },
   };
+  function ___syscall_chmod(path, mode) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      FS.chmod(path, mode);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_faccessat(dirfd, path, amode, flags) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      assert(!flags || flags == 512);
+      path = SYSCALLS.calculateAt(dirfd, path);
+      if (amode & ~7) {
+        // need a valid mode
+        return -28;
+      }
+      var lookup = FS.lookupPath(path, { follow: true });
+      var node = lookup.node;
+      if (!node) {
+        return -44;
+      }
+      var perms = '';
+      if (amode & 4) perms += 'r';
+      if (amode & 2) perms += 'w';
+      if (amode & 1) perms += 'x';
+      if (perms /* otherwise, they've just passed F_OK */ && FS.nodePermissions(node, perms)) {
+        return -2;
+      }
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  var INT53_MAX = 9007199254740992;
+  
+  var INT53_MIN = -9007199254740992;
+  var bigintToI53Checked = (num) => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
+  function ___syscall_fallocate(fd, mode, offset, len) {
+    offset = bigintToI53Checked(offset);
+    len = bigintToI53Checked(len);
+  
+  
+  try {
+  
+      if (isNaN(offset) || isNaN(len)) return -61;
+      if (mode != 0) {
+        return -138
+      }
+      if (offset < 0 || len < 0) {
+        return -28
+      }
+      // We only support mode == 0, which means we can implement fallocate
+      // in terms of ftruncate.
+      var oldSize = FS.fstat(fd).size;
+      var newSize = offset + len;
+      if (newSize > oldSize) {
+        FS.ftruncate(fd, newSize);
+      }
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  ;
+  }
+
+  function ___syscall_fchmod(fd, mode) {
+  try {
+  
+      FS.fchmod(fd, mode);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_fchown32(fd, owner, group) {
+  try {
+  
+      FS.fchown(fd, owner, group);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  var syscallGetVarargI = () => {
+      assert(SYSCALLS.varargs != undefined);
+      // the `+` prepended here is necessary to convince the JSCompiler that varargs is indeed a number.
+      var ret = HEAP32[((+SYSCALLS.varargs)>>2)];
+      SYSCALLS.varargs += 4;
+      return ret;
+    };
+  var syscallGetVarargP = syscallGetVarargI;
+  
+  
   function ___syscall_fcntl64(fd, cmd, varargs) {
   SYSCALLS.varargs = varargs;
   try {
@@ -3952,6 +4438,63 @@ async function createWasm() {
           return 0;
       }
       return -28;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_fdatasync(fd) {
+  try {
+  
+      var stream = SYSCALLS.getStreamFromFD(fd);
+      return 0; // we can't do anything synchronously; the in-memory FS is already synced to
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_fstat64(fd, buf) {
+  try {
+  
+      return SYSCALLS.writeStat(buf, FS.fstat(fd));
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_ftruncate64(fd, length) {
+    length = bigintToI53Checked(length);
+  
+  
+  try {
+  
+      if (isNaN(length)) return -61;
+      FS.ftruncate(fd, length);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  ;
+  }
+
+  
+  var stringToUTF8 = (str, outPtr, maxBytesToWrite) => {
+      assert(typeof maxBytesToWrite == 'number', 'stringToUTF8(str, outPtr, maxBytesToWrite) is missing the third parameter that specifies the length of the output buffer!');
+      return stringToUTF8Array(str, HEAPU8, outPtr, maxBytesToWrite);
+    };
+  function ___syscall_getcwd(buf, size) {
+  try {
+  
+      if (size === 0) return -28;
+      var cwd = FS.cwd();
+      var cwdLengthInBytes = lengthBytesUTF8(cwd) + 1;
+      if (size < cwdLengthInBytes) return -68;
+      stringToUTF8(cwd, buf, size);
+      return cwdLengthInBytes;
     } catch (e) {
     if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
@@ -4055,6 +4598,46 @@ async function createWasm() {
   }
   }
 
+  function ___syscall_lstat64(path, buf) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      return SYSCALLS.writeStat(buf, FS.lstat(path));
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_mkdirat(dirfd, path, mode) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      path = SYSCALLS.calculateAt(dirfd, path);
+      FS.mkdir(path, mode, 0);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_newfstatat(dirfd, path, buf, flags) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      var nofollow = flags & 256;
+      var allowEmpty = flags & 4096;
+      flags = flags & (~6400);
+      assert(!flags, `unknown flags in __syscall_newfstatat: ${flags}`);
+      path = SYSCALLS.calculateAt(dirfd, path, allowEmpty);
+      return SYSCALLS.writeStat(buf, nofollow ? FS.lstat(path) : FS.stat(path));
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
   
   function ___syscall_openat(dirfd, path, flags, varargs) {
   SYSCALLS.varargs = varargs;
@@ -4064,6 +4647,118 @@ async function createWasm() {
       path = SYSCALLS.calculateAt(dirfd, path);
       var mode = varargs ? syscallGetVarargI() : 0;
       return FS.open(path, flags, mode).fd;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  
+  
+  function ___syscall_readlinkat(dirfd, path, buf, bufsize) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      path = SYSCALLS.calculateAt(dirfd, path);
+      if (bufsize <= 0) return -28;
+      var ret = FS.readlink(path);
+  
+      var len = Math.min(bufsize, lengthBytesUTF8(ret));
+      var endChar = HEAP8[buf+len];
+      stringToUTF8(ret, buf, bufsize+1);
+      // readlink is one of the rare functions that write out a C string, but does never append a null to the output buffer(!)
+      // stringToUTF8() always appends a null byte, so restore the character under the null byte after the write.
+      HEAP8[buf+len] = endChar;
+      return len;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_rmdir(path) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      FS.rmdir(path);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_stat64(path, buf) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      return SYSCALLS.writeStat(buf, FS.stat(path));
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_unlinkat(dirfd, path, flags) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      path = SYSCALLS.calculateAt(dirfd, path);
+      if (!flags) {
+        FS.unlink(path);
+      } else if (flags === 512) {
+        FS.rmdir(path);
+      } else {
+        return -28;
+      }
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  }
+
+  var readI53FromI64 = (ptr) => {
+      return HEAPU32[((ptr)>>2)] + HEAP32[(((ptr)+(4))>>2)] * 4294967296;
+    };
+  
+  function ___syscall_utimensat(dirfd, path, times, flags) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      assert(!flags);
+      path = SYSCALLS.calculateAt(dirfd, path, true);
+      var now = Date.now(), atime, mtime;
+      if (!times) {
+        atime = now;
+        mtime = now;
+      } else {
+        var seconds = readI53FromI64(times);
+        var nanoseconds = HEAP32[(((times)+(8))>>2)];
+        if (nanoseconds == 1073741823) {
+          atime = now;
+        } else if (nanoseconds == 1073741822) {
+          atime = null;
+        } else {
+          atime = (seconds*1000) + (nanoseconds/(1000*1000));
+        }
+        times += 16;
+        seconds = readI53FromI64(times);
+        nanoseconds = HEAP32[(((times)+(8))>>2)];
+        if (nanoseconds == 1073741823) {
+          mtime = now;
+        } else if (nanoseconds == 1073741822) {
+          mtime = null;
+        } else {
+          mtime = (seconds*1000) + (nanoseconds/(1000*1000));
+        }
+      }
+      // null here means UTIME_OMIT was passed. If both were set to UTIME_OMIT then
+      // we can skip the call completely.
+      if ((mtime ?? atime) !== null) {
+        FS.utime(path, atime, mtime);
+      }
+      return 0;
     } catch (e) {
     if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
@@ -4443,7 +5138,6 @@ async function createWasm() {
     };
   
   
-  /** @suppress {duplicate } */
   /** @param {boolean|number=} implicit */
   var exitJS = (status, implicit) => {
       EXITSTATUS = status;
@@ -4482,6 +5176,7 @@ async function createWasm() {
         handleException(e);
       }
     };
+  
   
   var runtimeKeepalivePush = () => {
       runtimeKeepaliveCounter += 1;
@@ -4542,6 +5237,7 @@ async function createWasm() {
           }
         };
         Asyncify.funcWrappers.set(original, wrapper);
+        wrapper = createNamedFunction(`__asyncify_wrapper_${original.name}`, wrapper);
         return wrapper;
       },
   instrumentWasmExports(exports) {
@@ -5071,10 +5767,6 @@ async function createWasm() {
   
   
   
-  var stringToUTF8 = (str, outPtr, maxBytesToWrite) => {
-      assert(typeof maxBytesToWrite == 'number', 'stringToUTF8(str, outPtr, maxBytesToWrite) is missing the third parameter that specifies the length of the output buffer!');
-      return stringToUTF8Array(str, HEAPU8, outPtr, maxBytesToWrite);
-    };
   
   
   
@@ -5320,6 +6012,90 @@ async function createWasm() {
       });
     };
 
+  var isLeapYear = (year) => year%4 === 0 && (year%100 !== 0 || year%400 === 0);
+  
+  var MONTH_DAYS_LEAP_CUMULATIVE = [0,31,60,91,121,152,182,213,244,274,305,335];
+  
+  var MONTH_DAYS_REGULAR_CUMULATIVE = [0,31,59,90,120,151,181,212,243,273,304,334];
+  var ydayFromDate = (date) => {
+      var leap = isLeapYear(date.getFullYear());
+      var monthDaysCumulative = (leap ? MONTH_DAYS_LEAP_CUMULATIVE : MONTH_DAYS_REGULAR_CUMULATIVE);
+      var yday = monthDaysCumulative[date.getMonth()] + date.getDate() - 1; // -1 since it's days since Jan 1
+  
+      return yday;
+    };
+  
+  function __localtime_js(time, tmPtr) {
+    time = bigintToI53Checked(time);
+  
+  
+      var date = new Date(time*1000);
+      HEAP32[((tmPtr)>>2)] = date.getSeconds();
+      HEAP32[(((tmPtr)+(4))>>2)] = date.getMinutes();
+      HEAP32[(((tmPtr)+(8))>>2)] = date.getHours();
+      HEAP32[(((tmPtr)+(12))>>2)] = date.getDate();
+      HEAP32[(((tmPtr)+(16))>>2)] = date.getMonth();
+      HEAP32[(((tmPtr)+(20))>>2)] = date.getFullYear()-1900;
+      HEAP32[(((tmPtr)+(24))>>2)] = date.getDay();
+  
+      var yday = ydayFromDate(date)|0;
+      HEAP32[(((tmPtr)+(28))>>2)] = yday;
+      HEAP32[(((tmPtr)+(36))>>2)] = -(date.getTimezoneOffset() * 60);
+  
+      // Attention: DST is in December in South, and some regions don't have DST at all.
+      var start = new Date(date.getFullYear(), 0, 1);
+      var summerOffset = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+      var winterOffset = start.getTimezoneOffset();
+      var dst = (summerOffset != winterOffset && date.getTimezoneOffset() == Math.min(winterOffset, summerOffset))|0;
+      HEAP32[(((tmPtr)+(32))>>2)] = dst;
+    ;
+  }
+
+  
+  
+  
+  
+  
+  function __mmap_js(len, prot, flags, fd, offset, allocated, addr) {
+    offset = bigintToI53Checked(offset);
+  
+  
+  try {
+  
+      // musl's mmap doesn't allow values over a certain limit
+      // see OFF_MASK in mmap.c.
+      assert(!isNaN(offset));
+      var stream = SYSCALLS.getStreamFromFD(fd);
+      var res = FS.mmap(stream, len, offset, prot, flags);
+      var ptr = res.ptr;
+      HEAP32[((allocated)>>2)] = res.allocated;
+      HEAPU32[((addr)>>2)] = ptr;
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  ;
+  }
+
+  
+  function __munmap_js(addr, len, prot, flags, fd, offset) {
+    offset = bigintToI53Checked(offset);
+  
+  
+  try {
+  
+      var stream = SYSCALLS.getStreamFromFD(fd);
+      if (prot & 2) {
+        SYSCALLS.doMsync(addr, stream, len, flags, offset);
+      }
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return -e.errno;
+  }
+  ;
+  }
+
   
   var __tzset_js = (timezone, daylight, std_name, dst_name) => {
       // TODO: Use (malleable) environment variables instead of system settings.
@@ -5374,9 +6150,39 @@ async function createWasm() {
       }
     };
 
-  var _emscripten_err = (str) => err(UTF8ToString(str));
+  var _emscripten_get_now = () => performance.now();
+  
+  var _emscripten_date_now = () => Date.now();
+  
+  var nowIsMonotonic = 1;
+  
+  var checkWasiClock = (clock_id) => clock_id >= 0 && clock_id <= 3;
+  
+  function _clock_time_get(clk_id, ignored_precision, ptime) {
+    ignored_precision = bigintToI53Checked(ignored_precision);
+  
+  
+      if (!checkWasiClock(clk_id)) {
+        return 28;
+      }
+      var now;
+      // all wasi clocks but realtime are monotonic
+      if (clk_id === 0) {
+        now = _emscripten_date_now();
+      } else if (nowIsMonotonic) {
+        now = _emscripten_get_now();
+      } else {
+        return 52;
+      }
+      // "now" is in ms, and wasi times are in ns.
+      var nsec = Math.round(now * 1000 * 1000);
+      HEAP64[((ptime)>>3)] = BigInt(nsec);
+      return 0;
+    ;
+  }
 
-  var _emscripten_has_asyncify = () => 1;
+
+  var _emscripten_err = (str) => err(UTF8ToString(str));
 
   var getHeapMax = () =>
       // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
@@ -5384,11 +6190,12 @@ async function createWasm() {
       // for any code that deals with heap sizes, which would require special
       // casing all heap size related code to treat 0 specially.
       2147483648;
+  var _emscripten_get_heap_max = () => getHeapMax();
+
+
+  var _emscripten_has_asyncify = () => 1;
+
   
-  var alignMemory = (size, alignment) => {
-      assert(alignment, "alignment argument is required");
-      return Math.ceil(size / alignment) * alignment;
-    };
   
   var growMemory = (size) => {
       var oldHeapSize = wasmMemory.buffer.byteLength;
@@ -5604,7 +6411,6 @@ async function createWasm() {
   };
   
   
-  var _emscripten_get_now = () => performance.now();
   
   
     /**
@@ -5750,7 +6556,7 @@ async function createWasm() {
           // whether it is possible to perform a request here without needing to defer. See
           // https://developer.mozilla.org/en-US/docs/Web/Security/User_activation#transient_activation
           // and https://caniuse.com/mdn-api_useractivation
-          // At the time of writing, Firefox does not support this API: https://bugzilla.mozilla.org/show_bug.cgi?id=1791079
+          // At the time of writing, Firefox does not support this API: https://bugzil.la/1791079
           return navigator.userActivation.isActive;
         }
   
@@ -6703,10 +7509,6 @@ async function createWasm() {
   },
   };
   
-  var INT53_MAX = 9007199254740992;
-  
-  var INT53_MIN = -9007199254740992;
-  var bigintToI53Checked = (num) => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
   function _emwgpuAdapterRequestDevice(adapterPtr, futureId, deviceLostFutureId, devicePtr, queuePtr, descriptor) {
     futureId = bigintToI53Checked(futureId);
     deviceLostFutureId = bigintToI53Checked(deviceLostFutureId);
@@ -7068,6 +7870,32 @@ async function createWasm() {
   }
   }
 
+  function _fd_fdstat_get(fd, pbuf) {
+  try {
+  
+      var rightsBase = 0;
+      var rightsInheriting = 0;
+      var flags = 0;
+      {
+        var stream = SYSCALLS.getStreamFromFD(fd);
+        // All character devices are terminals (other things a Linux system would
+        // assume is a character device, like the mouse, we have special APIs for).
+        var type = stream.tty ? 2 :
+                   FS.isDir(stream.mode) ? 3 :
+                   FS.isLink(stream.mode) ? 7 :
+                   4;
+      }
+      HEAP8[pbuf] = type;
+      HEAP16[(((pbuf)+(2))>>1)] = flags;
+      HEAP64[(((pbuf)+(8))>>3)] = BigInt(rightsBase);
+      HEAP64[(((pbuf)+(16))>>3)] = BigInt(rightsInheriting);
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return e.errno;
+  }
+  }
+
   /** @param {number=} offset */
   var doReadv = (stream, iov, iovcnt, offset) => {
       var ret = 0;
@@ -7310,7 +8138,7 @@ async function createWasm() {
         // context on a canvas, calling .getContext() will always return that
         // context independent of which 'webgl' or 'webgl2'
         // context version was passed. See:
-        //   https://bugs.webkit.org/show_bug.cgi?id=222758
+        //   https://webkit.org/b/222758
         // and:
         //   https://github.com/emscripten-core/emscripten/issues/13295.
         // TODO: Once the bug is fixed and shipped in Safari, adjust the Safari
@@ -9399,9 +10227,6 @@ async function createWasm() {
       return ptr;
     };
 
-  var readI53FromI64 = (ptr) => {
-      return HEAPU32[((ptr)>>2)] + HEAP32[(((ptr)+(4))>>2)] * 4294967296;
-    };
   
   
   var _wgpuDeviceCreateBindGroup = (devicePtr, descriptor) => {
@@ -10029,7 +10854,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'convertU32PairToI53',
   'getTempRet0',
   'setTempRet0',
-  'zeroMemory',
   'withStackSave',
   'inetPton4',
   'inetNtop4',
@@ -10042,7 +10866,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'autoResumeAudioContext',
   'asmjsMangle',
   'HandleAllocator',
-  'getNativeTypeSize',
   'addOnInit',
   'addOnPostCtor',
   'addOnPreMain',
@@ -10099,7 +10922,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'jsStackTrace',
   'getCallstack',
   'convertPCtoSourceLocation',
-  'checkWasiClock',
   'wasiRightsToMuslOFlags',
   'wasiOFlagsToMuslOFlags',
   'setImmediateWrapped',
@@ -10113,8 +10935,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'makePromiseCallback',
   'findMatchingCatch',
   'Browser_asyncPrepareDataCounter',
-  'isLeapYear',
-  'ydayFromDate',
   'arraySum',
   'addDays',
   'getSocketFromFD',
@@ -10140,8 +10960,11 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'allocate',
   'writeStringToMemory',
   'writeAsciiToMemory',
+  'allocateUTF8',
+  'allocateUTF8OnStack',
   'demangle',
   'stackTrace',
+  'getNativeTypeSize',
   'getFunctionArgsName',
   'requireRegisteredType',
   'createJsInvokerSignature',
@@ -10191,7 +11014,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'err',
   'callMain',
   'abort',
-  'wasmMemory',
   'wasmExports',
   'HEAPF32',
   'HEAPF64',
@@ -10214,6 +11036,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'stackAlloc',
   'createNamedFunction',
   'ptrToString',
+  'zeroMemory',
   'exitJS',
   'getHeapMax',
   'growMemory',
@@ -10240,6 +11063,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'alignMemory',
   'mmapAlloc',
   'wasmTable',
+  'wasmMemory',
   'getUniqueRunDependency',
   'noExitRuntime',
   'addOnPreRun',
@@ -10281,6 +11105,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'UNWIND_CACHE',
   'ExitStatus',
   'getEnvStrings',
+  'checkWasiClock',
   'doReadv',
   'doWritev',
   'initRandomFill',
@@ -10305,6 +11130,8 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'MONTH_DAYS_LEAP',
   'MONTH_DAYS_REGULAR_CUMULATIVE',
   'MONTH_DAYS_LEAP_CUMULATIVE',
+  'isLeapYear',
+  'ydayFromDate',
   'SYSCALLS',
   'preloadPlugins',
   'FS_createPreloadedFile',
@@ -10451,8 +11278,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'SDL_gfx',
   'GLFW_Window',
   'GLFW',
-  'allocateUTF8',
-  'allocateUTF8OnStack',
   'print',
   'printErr',
   'jstoi_s',
@@ -10501,6 +11326,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'emval_symbols',
   'Emval',
   'emval_methodCallers',
+  'IDBFS',
   'WebGPU',
 ];
 unexportedSymbols.forEach(unexportedRuntimeSymbol);
@@ -10522,6 +11348,7 @@ var _free = makeInvalidEarlyAccess('_free');
 var _malloc = makeInvalidEarlyAccess('_malloc');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _main = Module['_main'] = makeInvalidEarlyAccess('_main');
+var _strerror = makeInvalidEarlyAccess('_strerror');
 var _emwgpuCreateBindGroup = makeInvalidEarlyAccess('_emwgpuCreateBindGroup');
 var _emwgpuCreateBindGroupLayout = makeInvalidEarlyAccess('_emwgpuCreateBindGroupLayout');
 var _emwgpuCreateCommandBuffer = makeInvalidEarlyAccess('_emwgpuCreateCommandBuffer');
@@ -10555,7 +11382,7 @@ var _emwgpuOnWorkDoneCompleted = makeInvalidEarlyAccess('_emwgpuOnWorkDoneComple
 var _emwgpuOnUncapturedError = makeInvalidEarlyAccess('_emwgpuOnUncapturedError');
 var _emscripten_stack_get_end = makeInvalidEarlyAccess('_emscripten_stack_get_end');
 var _emscripten_stack_get_base = makeInvalidEarlyAccess('_emscripten_stack_get_base');
-var _strerror = makeInvalidEarlyAccess('_strerror');
+var _emscripten_builtin_memalign = makeInvalidEarlyAccess('_emscripten_builtin_memalign');
 var _memalign = makeInvalidEarlyAccess('_memalign');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
 var _emscripten_stack_get_free = makeInvalidEarlyAccess('_emscripten_stack_get_free');
@@ -10578,6 +11405,17 @@ var dynCall_viiii = makeInvalidEarlyAccess('dynCall_viiii');
 var dynCall_iii = makeInvalidEarlyAccess('dynCall_iii');
 var dynCall_iiiii = makeInvalidEarlyAccess('dynCall_iiiii');
 var dynCall_iiiiiiii = makeInvalidEarlyAccess('dynCall_iiiiiiii');
+var dynCall_iiiij = makeInvalidEarlyAccess('dynCall_iiiij');
+var dynCall_vijii = makeInvalidEarlyAccess('dynCall_vijii');
+var dynCall_iijj = makeInvalidEarlyAccess('dynCall_iijj');
+var dynCall_iij = makeInvalidEarlyAccess('dynCall_iij');
+var dynCall_iijii = makeInvalidEarlyAccess('dynCall_iijii');
+var dynCall_iiji = makeInvalidEarlyAccess('dynCall_iiji');
+var dynCall_i = makeInvalidEarlyAccess('dynCall_i');
+var dynCall_iiiiiij = makeInvalidEarlyAccess('dynCall_iiiiiij');
+var dynCall_dd = makeInvalidEarlyAccess('dynCall_dd');
+var dynCall_ddd = makeInvalidEarlyAccess('dynCall_ddd');
+var dynCall_ji = makeInvalidEarlyAccess('dynCall_ji');
 var dynCall_viji = makeInvalidEarlyAccess('dynCall_viji');
 var dynCall_jiji = makeInvalidEarlyAccess('dynCall_jiji');
 var dynCall_iidiiii = makeInvalidEarlyAccess('dynCall_iidiiii');
@@ -10591,86 +11429,187 @@ var _asyncify_start_unwind = makeInvalidEarlyAccess('_asyncify_start_unwind');
 var _asyncify_stop_unwind = makeInvalidEarlyAccess('_asyncify_stop_unwind');
 var _asyncify_start_rewind = makeInvalidEarlyAccess('_asyncify_start_rewind');
 var _asyncify_stop_rewind = makeInvalidEarlyAccess('_asyncify_stop_rewind');
+var memory = makeInvalidEarlyAccess('memory');
+var __indirect_function_table = makeInvalidEarlyAccess('__indirect_function_table');
 var wasmMemory = makeInvalidEarlyAccess('wasmMemory');
-var wasmTable = makeInvalidEarlyAccess('wasmTable');
 
 function assignWasmExports(wasmExports) {
+  assert(typeof wasmExports['__getTypeName'] != 'undefined', 'missing Wasm export: __getTypeName');
   ___getTypeName = createExportWrapper('__getTypeName', 1);
+  assert(typeof wasmExports['free'] != 'undefined', 'missing Wasm export: free');
   _free = createExportWrapper('free', 1);
+  assert(typeof wasmExports['malloc'] != 'undefined', 'missing Wasm export: malloc');
   _malloc = createExportWrapper('malloc', 1);
+  assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
   _fflush = createExportWrapper('fflush', 1);
+  assert(typeof wasmExports['main'] != 'undefined', 'missing Wasm export: main');
   _main = Module['_main'] = createExportWrapper('main', 2);
-  _emwgpuCreateBindGroup = createExportWrapper('emwgpuCreateBindGroup', 1);
-  _emwgpuCreateBindGroupLayout = createExportWrapper('emwgpuCreateBindGroupLayout', 1);
-  _emwgpuCreateCommandBuffer = createExportWrapper('emwgpuCreateCommandBuffer', 1);
-  _emwgpuCreateCommandEncoder = createExportWrapper('emwgpuCreateCommandEncoder', 1);
-  _emwgpuCreateComputePassEncoder = createExportWrapper('emwgpuCreateComputePassEncoder', 1);
-  _emwgpuCreateComputePipeline = createExportWrapper('emwgpuCreateComputePipeline', 1);
-  _emwgpuCreatePipelineLayout = createExportWrapper('emwgpuCreatePipelineLayout', 1);
-  _emwgpuCreateQuerySet = createExportWrapper('emwgpuCreateQuerySet', 1);
-  _emwgpuCreateRenderBundle = createExportWrapper('emwgpuCreateRenderBundle', 1);
-  _emwgpuCreateRenderBundleEncoder = createExportWrapper('emwgpuCreateRenderBundleEncoder', 1);
-  _emwgpuCreateRenderPassEncoder = createExportWrapper('emwgpuCreateRenderPassEncoder', 1);
-  _emwgpuCreateRenderPipeline = createExportWrapper('emwgpuCreateRenderPipeline', 1);
-  _emwgpuCreateSampler = createExportWrapper('emwgpuCreateSampler', 1);
-  _emwgpuCreateSurface = createExportWrapper('emwgpuCreateSurface', 1);
-  _emwgpuCreateTexture = createExportWrapper('emwgpuCreateTexture', 1);
-  _emwgpuCreateTextureView = createExportWrapper('emwgpuCreateTextureView', 1);
-  _emwgpuCreateAdapter = createExportWrapper('emwgpuCreateAdapter', 1);
-  _emwgpuCreateBuffer = createExportWrapper('emwgpuCreateBuffer', 2);
-  _emwgpuCreateDevice = createExportWrapper('emwgpuCreateDevice', 2);
-  _emwgpuCreateQueue = createExportWrapper('emwgpuCreateQueue', 1);
-  _emwgpuCreateShaderModule = createExportWrapper('emwgpuCreateShaderModule', 1);
-  _emwgpuOnCompilationInfoCompleted = createExportWrapper('emwgpuOnCompilationInfoCompleted', 3);
-  _emwgpuOnCreateComputePipelineCompleted = createExportWrapper('emwgpuOnCreateComputePipelineCompleted', 4);
-  _emwgpuOnCreateRenderPipelineCompleted = createExportWrapper('emwgpuOnCreateRenderPipelineCompleted', 4);
-  _emwgpuOnDeviceLostCompleted = createExportWrapper('emwgpuOnDeviceLostCompleted', 3);
-  _emwgpuOnMapAsyncCompleted = createExportWrapper('emwgpuOnMapAsyncCompleted', 3);
-  _emwgpuOnPopErrorScopeCompleted = createExportWrapper('emwgpuOnPopErrorScopeCompleted', 4);
-  _emwgpuOnRequestAdapterCompleted = createExportWrapper('emwgpuOnRequestAdapterCompleted', 4);
-  _emwgpuOnRequestDeviceCompleted = createExportWrapper('emwgpuOnRequestDeviceCompleted', 4);
-  _emwgpuOnWorkDoneCompleted = createExportWrapper('emwgpuOnWorkDoneCompleted', 2);
-  _emwgpuOnUncapturedError = createExportWrapper('emwgpuOnUncapturedError', 3);
-  _emscripten_stack_get_end = wasmExports['emscripten_stack_get_end'];
-  _emscripten_stack_get_base = wasmExports['emscripten_stack_get_base'];
+  assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
   _strerror = createExportWrapper('strerror', 1);
+  assert(typeof wasmExports['emwgpuCreateBindGroup'] != 'undefined', 'missing Wasm export: emwgpuCreateBindGroup');
+  _emwgpuCreateBindGroup = createExportWrapper('emwgpuCreateBindGroup', 1);
+  assert(typeof wasmExports['emwgpuCreateBindGroupLayout'] != 'undefined', 'missing Wasm export: emwgpuCreateBindGroupLayout');
+  _emwgpuCreateBindGroupLayout = createExportWrapper('emwgpuCreateBindGroupLayout', 1);
+  assert(typeof wasmExports['emwgpuCreateCommandBuffer'] != 'undefined', 'missing Wasm export: emwgpuCreateCommandBuffer');
+  _emwgpuCreateCommandBuffer = createExportWrapper('emwgpuCreateCommandBuffer', 1);
+  assert(typeof wasmExports['emwgpuCreateCommandEncoder'] != 'undefined', 'missing Wasm export: emwgpuCreateCommandEncoder');
+  _emwgpuCreateCommandEncoder = createExportWrapper('emwgpuCreateCommandEncoder', 1);
+  assert(typeof wasmExports['emwgpuCreateComputePassEncoder'] != 'undefined', 'missing Wasm export: emwgpuCreateComputePassEncoder');
+  _emwgpuCreateComputePassEncoder = createExportWrapper('emwgpuCreateComputePassEncoder', 1);
+  assert(typeof wasmExports['emwgpuCreateComputePipeline'] != 'undefined', 'missing Wasm export: emwgpuCreateComputePipeline');
+  _emwgpuCreateComputePipeline = createExportWrapper('emwgpuCreateComputePipeline', 1);
+  assert(typeof wasmExports['emwgpuCreatePipelineLayout'] != 'undefined', 'missing Wasm export: emwgpuCreatePipelineLayout');
+  _emwgpuCreatePipelineLayout = createExportWrapper('emwgpuCreatePipelineLayout', 1);
+  assert(typeof wasmExports['emwgpuCreateQuerySet'] != 'undefined', 'missing Wasm export: emwgpuCreateQuerySet');
+  _emwgpuCreateQuerySet = createExportWrapper('emwgpuCreateQuerySet', 1);
+  assert(typeof wasmExports['emwgpuCreateRenderBundle'] != 'undefined', 'missing Wasm export: emwgpuCreateRenderBundle');
+  _emwgpuCreateRenderBundle = createExportWrapper('emwgpuCreateRenderBundle', 1);
+  assert(typeof wasmExports['emwgpuCreateRenderBundleEncoder'] != 'undefined', 'missing Wasm export: emwgpuCreateRenderBundleEncoder');
+  _emwgpuCreateRenderBundleEncoder = createExportWrapper('emwgpuCreateRenderBundleEncoder', 1);
+  assert(typeof wasmExports['emwgpuCreateRenderPassEncoder'] != 'undefined', 'missing Wasm export: emwgpuCreateRenderPassEncoder');
+  _emwgpuCreateRenderPassEncoder = createExportWrapper('emwgpuCreateRenderPassEncoder', 1);
+  assert(typeof wasmExports['emwgpuCreateRenderPipeline'] != 'undefined', 'missing Wasm export: emwgpuCreateRenderPipeline');
+  _emwgpuCreateRenderPipeline = createExportWrapper('emwgpuCreateRenderPipeline', 1);
+  assert(typeof wasmExports['emwgpuCreateSampler'] != 'undefined', 'missing Wasm export: emwgpuCreateSampler');
+  _emwgpuCreateSampler = createExportWrapper('emwgpuCreateSampler', 1);
+  assert(typeof wasmExports['emwgpuCreateSurface'] != 'undefined', 'missing Wasm export: emwgpuCreateSurface');
+  _emwgpuCreateSurface = createExportWrapper('emwgpuCreateSurface', 1);
+  assert(typeof wasmExports['emwgpuCreateTexture'] != 'undefined', 'missing Wasm export: emwgpuCreateTexture');
+  _emwgpuCreateTexture = createExportWrapper('emwgpuCreateTexture', 1);
+  assert(typeof wasmExports['emwgpuCreateTextureView'] != 'undefined', 'missing Wasm export: emwgpuCreateTextureView');
+  _emwgpuCreateTextureView = createExportWrapper('emwgpuCreateTextureView', 1);
+  assert(typeof wasmExports['emwgpuCreateAdapter'] != 'undefined', 'missing Wasm export: emwgpuCreateAdapter');
+  _emwgpuCreateAdapter = createExportWrapper('emwgpuCreateAdapter', 1);
+  assert(typeof wasmExports['emwgpuCreateBuffer'] != 'undefined', 'missing Wasm export: emwgpuCreateBuffer');
+  _emwgpuCreateBuffer = createExportWrapper('emwgpuCreateBuffer', 2);
+  assert(typeof wasmExports['emwgpuCreateDevice'] != 'undefined', 'missing Wasm export: emwgpuCreateDevice');
+  _emwgpuCreateDevice = createExportWrapper('emwgpuCreateDevice', 2);
+  assert(typeof wasmExports['emwgpuCreateQueue'] != 'undefined', 'missing Wasm export: emwgpuCreateQueue');
+  _emwgpuCreateQueue = createExportWrapper('emwgpuCreateQueue', 1);
+  assert(typeof wasmExports['emwgpuCreateShaderModule'] != 'undefined', 'missing Wasm export: emwgpuCreateShaderModule');
+  _emwgpuCreateShaderModule = createExportWrapper('emwgpuCreateShaderModule', 1);
+  assert(typeof wasmExports['emwgpuOnCompilationInfoCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnCompilationInfoCompleted');
+  _emwgpuOnCompilationInfoCompleted = createExportWrapper('emwgpuOnCompilationInfoCompleted', 3);
+  assert(typeof wasmExports['emwgpuOnCreateComputePipelineCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnCreateComputePipelineCompleted');
+  _emwgpuOnCreateComputePipelineCompleted = createExportWrapper('emwgpuOnCreateComputePipelineCompleted', 4);
+  assert(typeof wasmExports['emwgpuOnCreateRenderPipelineCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnCreateRenderPipelineCompleted');
+  _emwgpuOnCreateRenderPipelineCompleted = createExportWrapper('emwgpuOnCreateRenderPipelineCompleted', 4);
+  assert(typeof wasmExports['emwgpuOnDeviceLostCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnDeviceLostCompleted');
+  _emwgpuOnDeviceLostCompleted = createExportWrapper('emwgpuOnDeviceLostCompleted', 3);
+  assert(typeof wasmExports['emwgpuOnMapAsyncCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnMapAsyncCompleted');
+  _emwgpuOnMapAsyncCompleted = createExportWrapper('emwgpuOnMapAsyncCompleted', 3);
+  assert(typeof wasmExports['emwgpuOnPopErrorScopeCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnPopErrorScopeCompleted');
+  _emwgpuOnPopErrorScopeCompleted = createExportWrapper('emwgpuOnPopErrorScopeCompleted', 4);
+  assert(typeof wasmExports['emwgpuOnRequestAdapterCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnRequestAdapterCompleted');
+  _emwgpuOnRequestAdapterCompleted = createExportWrapper('emwgpuOnRequestAdapterCompleted', 4);
+  assert(typeof wasmExports['emwgpuOnRequestDeviceCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnRequestDeviceCompleted');
+  _emwgpuOnRequestDeviceCompleted = createExportWrapper('emwgpuOnRequestDeviceCompleted', 4);
+  assert(typeof wasmExports['emwgpuOnWorkDoneCompleted'] != 'undefined', 'missing Wasm export: emwgpuOnWorkDoneCompleted');
+  _emwgpuOnWorkDoneCompleted = createExportWrapper('emwgpuOnWorkDoneCompleted', 2);
+  assert(typeof wasmExports['emwgpuOnUncapturedError'] != 'undefined', 'missing Wasm export: emwgpuOnUncapturedError');
+  _emwgpuOnUncapturedError = createExportWrapper('emwgpuOnUncapturedError', 3);
+  assert(typeof wasmExports['emscripten_stack_get_end'] != 'undefined', 'missing Wasm export: emscripten_stack_get_end');
+  _emscripten_stack_get_end = wasmExports['emscripten_stack_get_end'];
+  assert(typeof wasmExports['emscripten_stack_get_base'] != 'undefined', 'missing Wasm export: emscripten_stack_get_base');
+  _emscripten_stack_get_base = wasmExports['emscripten_stack_get_base'];
+  assert(typeof wasmExports['emscripten_builtin_memalign'] != 'undefined', 'missing Wasm export: emscripten_builtin_memalign');
+  _emscripten_builtin_memalign = createExportWrapper('emscripten_builtin_memalign', 2);
+  assert(typeof wasmExports['memalign'] != 'undefined', 'missing Wasm export: memalign');
   _memalign = createExportWrapper('memalign', 2);
+  assert(typeof wasmExports['emscripten_stack_init'] != 'undefined', 'missing Wasm export: emscripten_stack_init');
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];
+  assert(typeof wasmExports['emscripten_stack_get_free'] != 'undefined', 'missing Wasm export: emscripten_stack_get_free');
   _emscripten_stack_get_free = wasmExports['emscripten_stack_get_free'];
+  assert(typeof wasmExports['_emscripten_stack_restore'] != 'undefined', 'missing Wasm export: _emscripten_stack_restore');
   __emscripten_stack_restore = wasmExports['_emscripten_stack_restore'];
+  assert(typeof wasmExports['_emscripten_stack_alloc'] != 'undefined', 'missing Wasm export: _emscripten_stack_alloc');
   __emscripten_stack_alloc = wasmExports['_emscripten_stack_alloc'];
+  assert(typeof wasmExports['emscripten_stack_get_current'] != 'undefined', 'missing Wasm export: emscripten_stack_get_current');
   _emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'];
+  assert(typeof wasmExports['dynCall_viiiii'] != 'undefined', 'missing Wasm export: dynCall_viiiii');
   dynCall_viiiii = dynCalls['viiiii'] = createExportWrapper('dynCall_viiiii', 6);
+  assert(typeof wasmExports['dynCall_ii'] != 'undefined', 'missing Wasm export: dynCall_ii');
   dynCall_ii = dynCalls['ii'] = createExportWrapper('dynCall_ii', 2);
+  assert(typeof wasmExports['dynCall_viii'] != 'undefined', 'missing Wasm export: dynCall_viii');
   dynCall_viii = dynCalls['viii'] = createExportWrapper('dynCall_viii', 4);
+  assert(typeof wasmExports['dynCall_viiiiii'] != 'undefined', 'missing Wasm export: dynCall_viiiiii');
   dynCall_viiiiii = dynCalls['viiiiii'] = createExportWrapper('dynCall_viiiiii', 7);
+  assert(typeof wasmExports['dynCall_iiiiii'] != 'undefined', 'missing Wasm export: dynCall_iiiiii');
   dynCall_iiiiii = dynCalls['iiiiii'] = createExportWrapper('dynCall_iiiiii', 6);
+  assert(typeof wasmExports['dynCall_vi'] != 'undefined', 'missing Wasm export: dynCall_vi');
   dynCall_vi = dynCalls['vi'] = createExportWrapper('dynCall_vi', 2);
+  assert(typeof wasmExports['dynCall_v'] != 'undefined', 'missing Wasm export: dynCall_v');
   dynCall_v = dynCalls['v'] = createExportWrapper('dynCall_v', 1);
+  assert(typeof wasmExports['dynCall_iiiiiii'] != 'undefined', 'missing Wasm export: dynCall_iiiiiii');
   dynCall_iiiiiii = dynCalls['iiiiiii'] = createExportWrapper('dynCall_iiiiiii', 7);
+  assert(typeof wasmExports['dynCall_iiii'] != 'undefined', 'missing Wasm export: dynCall_iiii');
   dynCall_iiii = dynCalls['iiii'] = createExportWrapper('dynCall_iiii', 4);
+  assert(typeof wasmExports['dynCall_vii'] != 'undefined', 'missing Wasm export: dynCall_vii');
   dynCall_vii = dynCalls['vii'] = createExportWrapper('dynCall_vii', 3);
+  assert(typeof wasmExports['dynCall_ff'] != 'undefined', 'missing Wasm export: dynCall_ff');
   dynCall_ff = dynCalls['ff'] = createExportWrapper('dynCall_ff', 2);
+  assert(typeof wasmExports['dynCall_vidd'] != 'undefined', 'missing Wasm export: dynCall_vidd');
   dynCall_vidd = dynCalls['vidd'] = createExportWrapper('dynCall_vidd', 4);
+  assert(typeof wasmExports['dynCall_viiii'] != 'undefined', 'missing Wasm export: dynCall_viiii');
   dynCall_viiii = dynCalls['viiii'] = createExportWrapper('dynCall_viiii', 5);
+  assert(typeof wasmExports['dynCall_iii'] != 'undefined', 'missing Wasm export: dynCall_iii');
   dynCall_iii = dynCalls['iii'] = createExportWrapper('dynCall_iii', 3);
+  assert(typeof wasmExports['dynCall_iiiii'] != 'undefined', 'missing Wasm export: dynCall_iiiii');
   dynCall_iiiii = dynCalls['iiiii'] = createExportWrapper('dynCall_iiiii', 5);
+  assert(typeof wasmExports['dynCall_iiiiiiii'] != 'undefined', 'missing Wasm export: dynCall_iiiiiiii');
   dynCall_iiiiiiii = dynCalls['iiiiiiii'] = createExportWrapper('dynCall_iiiiiiii', 8);
+  assert(typeof wasmExports['dynCall_iiiij'] != 'undefined', 'missing Wasm export: dynCall_iiiij');
+  dynCall_iiiij = dynCalls['iiiij'] = createExportWrapper('dynCall_iiiij', 5);
+  assert(typeof wasmExports['dynCall_vijii'] != 'undefined', 'missing Wasm export: dynCall_vijii');
+  dynCall_vijii = dynCalls['vijii'] = createExportWrapper('dynCall_vijii', 5);
+  assert(typeof wasmExports['dynCall_iijj'] != 'undefined', 'missing Wasm export: dynCall_iijj');
+  dynCall_iijj = dynCalls['iijj'] = createExportWrapper('dynCall_iijj', 4);
+  assert(typeof wasmExports['dynCall_iij'] != 'undefined', 'missing Wasm export: dynCall_iij');
+  dynCall_iij = dynCalls['iij'] = createExportWrapper('dynCall_iij', 3);
+  assert(typeof wasmExports['dynCall_iijii'] != 'undefined', 'missing Wasm export: dynCall_iijii');
+  dynCall_iijii = dynCalls['iijii'] = createExportWrapper('dynCall_iijii', 5);
+  assert(typeof wasmExports['dynCall_iiji'] != 'undefined', 'missing Wasm export: dynCall_iiji');
+  dynCall_iiji = dynCalls['iiji'] = createExportWrapper('dynCall_iiji', 4);
+  assert(typeof wasmExports['dynCall_i'] != 'undefined', 'missing Wasm export: dynCall_i');
+  dynCall_i = dynCalls['i'] = createExportWrapper('dynCall_i', 1);
+  assert(typeof wasmExports['dynCall_iiiiiij'] != 'undefined', 'missing Wasm export: dynCall_iiiiiij');
+  dynCall_iiiiiij = dynCalls['iiiiiij'] = createExportWrapper('dynCall_iiiiiij', 7);
+  assert(typeof wasmExports['dynCall_dd'] != 'undefined', 'missing Wasm export: dynCall_dd');
+  dynCall_dd = dynCalls['dd'] = createExportWrapper('dynCall_dd', 2);
+  assert(typeof wasmExports['dynCall_ddd'] != 'undefined', 'missing Wasm export: dynCall_ddd');
+  dynCall_ddd = dynCalls['ddd'] = createExportWrapper('dynCall_ddd', 3);
+  assert(typeof wasmExports['dynCall_ji'] != 'undefined', 'missing Wasm export: dynCall_ji');
+  dynCall_ji = dynCalls['ji'] = createExportWrapper('dynCall_ji', 2);
+  assert(typeof wasmExports['dynCall_viji'] != 'undefined', 'missing Wasm export: dynCall_viji');
   dynCall_viji = dynCalls['viji'] = createExportWrapper('dynCall_viji', 4);
+  assert(typeof wasmExports['dynCall_jiji'] != 'undefined', 'missing Wasm export: dynCall_jiji');
   dynCall_jiji = dynCalls['jiji'] = createExportWrapper('dynCall_jiji', 4);
+  assert(typeof wasmExports['dynCall_iidiiii'] != 'undefined', 'missing Wasm export: dynCall_iidiiii');
   dynCall_iidiiii = dynCalls['iidiiii'] = createExportWrapper('dynCall_iidiiii', 7);
+  assert(typeof wasmExports['dynCall_viijii'] != 'undefined', 'missing Wasm export: dynCall_viijii');
   dynCall_viijii = dynCalls['viijii'] = createExportWrapper('dynCall_viijii', 6);
+  assert(typeof wasmExports['dynCall_iiiiiiiii'] != 'undefined', 'missing Wasm export: dynCall_iiiiiiiii');
   dynCall_iiiiiiiii = dynCalls['iiiiiiiii'] = createExportWrapper('dynCall_iiiiiiiii', 9);
+  assert(typeof wasmExports['dynCall_iiiiij'] != 'undefined', 'missing Wasm export: dynCall_iiiiij');
   dynCall_iiiiij = dynCalls['iiiiij'] = createExportWrapper('dynCall_iiiiij', 6);
+  assert(typeof wasmExports['dynCall_iiiiid'] != 'undefined', 'missing Wasm export: dynCall_iiiiid');
   dynCall_iiiiid = dynCalls['iiiiid'] = createExportWrapper('dynCall_iiiiid', 6);
+  assert(typeof wasmExports['dynCall_iiiiijj'] != 'undefined', 'missing Wasm export: dynCall_iiiiijj');
   dynCall_iiiiijj = dynCalls['iiiiijj'] = createExportWrapper('dynCall_iiiiijj', 7);
+  assert(typeof wasmExports['dynCall_iiiiiijj'] != 'undefined', 'missing Wasm export: dynCall_iiiiiijj');
   dynCall_iiiiiijj = dynCalls['iiiiiijj'] = createExportWrapper('dynCall_iiiiiijj', 8);
+  assert(typeof wasmExports['asyncify_start_unwind'] != 'undefined', 'missing Wasm export: asyncify_start_unwind');
   _asyncify_start_unwind = createExportWrapper('asyncify_start_unwind', 1);
+  assert(typeof wasmExports['asyncify_stop_unwind'] != 'undefined', 'missing Wasm export: asyncify_stop_unwind');
   _asyncify_stop_unwind = createExportWrapper('asyncify_stop_unwind', 0);
+  assert(typeof wasmExports['asyncify_start_rewind'] != 'undefined', 'missing Wasm export: asyncify_start_rewind');
   _asyncify_start_rewind = createExportWrapper('asyncify_start_rewind', 1);
+  assert(typeof wasmExports['asyncify_stop_rewind'] != 'undefined', 'missing Wasm export: asyncify_stop_rewind');
   _asyncify_stop_rewind = createExportWrapper('asyncify_stop_rewind', 0);
-  wasmMemory = wasmExports['memory'];
-  wasmTable = wasmExports['__indirect_function_table'];
+  assert(typeof wasmExports['memory'] != 'undefined', 'missing Wasm export: memory');
+  memory = wasmMemory = wasmExports['memory'];
+  assert(typeof wasmExports['__indirect_function_table'] != 'undefined', 'missing Wasm export: __indirect_function_table');
+  __indirect_function_table = wasmExports['__indirect_function_table'];
 }
 
 var wasmImports = {
@@ -10681,11 +11620,45 @@ var wasmImports = {
   /** @export */
   __cxa_throw: ___cxa_throw,
   /** @export */
+  __syscall_chmod: ___syscall_chmod,
+  /** @export */
+  __syscall_faccessat: ___syscall_faccessat,
+  /** @export */
+  __syscall_fallocate: ___syscall_fallocate,
+  /** @export */
+  __syscall_fchmod: ___syscall_fchmod,
+  /** @export */
+  __syscall_fchown32: ___syscall_fchown32,
+  /** @export */
   __syscall_fcntl64: ___syscall_fcntl64,
+  /** @export */
+  __syscall_fdatasync: ___syscall_fdatasync,
+  /** @export */
+  __syscall_fstat64: ___syscall_fstat64,
+  /** @export */
+  __syscall_ftruncate64: ___syscall_ftruncate64,
+  /** @export */
+  __syscall_getcwd: ___syscall_getcwd,
   /** @export */
   __syscall_ioctl: ___syscall_ioctl,
   /** @export */
+  __syscall_lstat64: ___syscall_lstat64,
+  /** @export */
+  __syscall_mkdirat: ___syscall_mkdirat,
+  /** @export */
+  __syscall_newfstatat: ___syscall_newfstatat,
+  /** @export */
   __syscall_openat: ___syscall_openat,
+  /** @export */
+  __syscall_readlinkat: ___syscall_readlinkat,
+  /** @export */
+  __syscall_rmdir: ___syscall_rmdir,
+  /** @export */
+  __syscall_stat64: ___syscall_stat64,
+  /** @export */
+  __syscall_unlinkat: ___syscall_unlinkat,
+  /** @export */
+  __syscall_utimensat: ___syscall_utimensat,
   /** @export */
   _abort_js: __abort_js,
   /** @export */
@@ -10709,9 +11682,23 @@ var wasmImports = {
   /** @export */
   _embind_register_void: __embind_register_void,
   /** @export */
+  _localtime_js: __localtime_js,
+  /** @export */
+  _mmap_js: __mmap_js,
+  /** @export */
+  _munmap_js: __munmap_js,
+  /** @export */
   _tzset_js: __tzset_js,
   /** @export */
+  clock_time_get: _clock_time_get,
+  /** @export */
+  emscripten_date_now: _emscripten_date_now,
+  /** @export */
   emscripten_err: _emscripten_err,
+  /** @export */
+  emscripten_get_heap_max: _emscripten_get_heap_max,
+  /** @export */
+  emscripten_get_now: _emscripten_get_now,
   /** @export */
   emscripten_has_asyncify: _emscripten_has_asyncify,
   /** @export */
@@ -10746,6 +11733,8 @@ var wasmImports = {
   exit: _exit,
   /** @export */
   fd_close: _fd_close,
+  /** @export */
+  fd_fdstat_get: _fd_fdstat_get,
   /** @export */
   fd_read: _fd_read,
   /** @export */
