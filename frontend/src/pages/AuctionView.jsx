@@ -17,11 +17,11 @@ export default function AuctionView() {
         </h2>
         
         <div className="flex items-center gap-2 text-sm">
-          <a href="/viewer3d" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-2 py-1 rounded-lg">
+          <a href="/viewer3d" className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-2 py-1 rounded-lg">
               Pełny ekran
             </a>
          
-         <a href="/auctionview" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-2 py-1 rounded-lg">
+         <a href="/auctionview" className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-2 py-1 rounded-lg">
               Instrukcja
             </a>
         </div>
@@ -90,7 +90,7 @@ export default function AuctionView() {
       </div>
 
       <button className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center transition">
-        <i class="fas fa-gavel text-blue-400 text-xl mr-2"></i> LICYTUJ TERAZ
+        <i className="fas fa-gavel text-blue-400 text-xl mr-2"></i> LICYTUJ TERAZ
       </button>
     </div>
   </div>
@@ -113,12 +113,14 @@ export default function AuctionView() {
           libero. Donec feugiat accumsan magna, a fringilla libero convallis
           ut.
         </p>
-        <p className="mt-3">
+        <div className="mt-3">
           <h5 className="font-semibold mb-1">Szczegółowe dane techniczne:</h5>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-          ullamcorper, mi vitae commodo vestibulum, urna urna vestibulum
-          sapien, nec (ewentualnie lista)
-        </p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+            ullamcorper, mi vitae commodo vestibulum, urna urna vestibulum
+            sapien, nec (ewentualnie lista)
+          </p>
+        </div>
       </div>
     </div>
   </div>
