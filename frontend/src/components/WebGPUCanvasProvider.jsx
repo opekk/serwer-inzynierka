@@ -394,6 +394,7 @@ export function WebGPUCanvasProvider({ children }) {
       const normalized = getNormalizedOptions(options)
       const callback = typeof options.onModelChange === 'function' ? options.onModelChange : null
       onModelChangeRef.current = callback
+      const requestedModel = typeof options.model === 'string' ? options.model : null
 
       setActiveSlot((prev) => {
         const replacingAnotherSlot = prev.slotId && prev.slotId !== slotId
@@ -413,12 +414,34 @@ export function WebGPUCanvasProvider({ children }) {
           scheduleMicrotask(() => notifyModelChange(currentModelRef.current))
         }
 
-        return {
+        const next = {
           slotId,
           container,
           options: normalized,
           onModelChange: callback
         }
+
+        if (requestedModel && requestedModel !== currentModelRef.current) {
+          // Show loading overlay while switching models
+          setIsLoading(true)
+          scheduleMicrotask(() => {
+            if (window.Module && typeof window.Module.change_model === 'function') {
+              try {
+                window.Module.change_model(requestedModel)
+                currentModelRef.current = requestedModel
+              } catch (err) {
+                console.error('Auto model change failed:', err)
+              } finally {
+                // Heuristic: keep overlay visible briefly to cover black frame
+                setTimeout(() => setIsLoading(false), 1000)
+              }
+            } else {
+              setIsLoading(false)
+            }
+          })
+        }
+
+        return next
       })
     },
     [notifyModelChange]
