@@ -314,7 +314,9 @@ function SharedWebGPUCanvas({
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
             <div className="text-white text-center">
-              <div className="mb-2">Loading 3D viewer...</div>
+              <div className="mb-2">
+                {moduleReady ? 'Loading model…' : 'Initializing 3D viewer…'}
+              </div>
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
             </div>
           </div>
