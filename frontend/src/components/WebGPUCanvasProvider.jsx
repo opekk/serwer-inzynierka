@@ -129,14 +129,19 @@ function SharedWebGPUCanvas({
 
     applyCanvasSizing(canvas, width, height, intrinsicWidth, intrinsicHeight)
 
-    if (typeof window !== 'undefined' && window.Module && typeof window.Module.resize_canvas === 'function') {
+    if (
+      moduleReady &&
+      typeof window !== 'undefined' &&
+      window.Module &&
+      typeof window.Module.resize_canvas === 'function'
+    ) {
       try {
         window.Module.resize_canvas(intrinsicWidth, intrinsicHeight)
       } catch (err) {
         console.error('Module.resize_canvas failed:', err)
       }
     }
-  }, [width, height])
+  }, [width, height, moduleReady])
 
   useEffect(() => {
     syncCanvasSizing()
@@ -204,6 +209,36 @@ function SharedWebGPUCanvas({
           }
           // IDBFS mount (will persist between sessions)
           FSRef.mount(IDBFSRef, {}, '/database')
+
+          // Mount a persistent cache for fetched resources so EMSCRIPTEN_FETCH_PERSIST_FILE
+          // writes survive reloads. Ensure the mount point exists first.
+          try {
+            if (!FSRef.analyzePath('/resources_cache').exists) {
+              FSRef.mkdir('/resources_cache')
+            }
+            FSRef.mount(IDBFSRef, {}, '/resources_cache')
+          } catch (mountErr) {
+            console.warn('Failed to mount IDBFS at /resources_cache:', mountErr)
+          }
+
+          // Ensure common asset directories exist in VFS for persisted fetches
+          try {
+            if (!FSRef.analyzePath('/public').exists) {
+              FSRef.mkdir('/public')
+            }
+            if (!FSRef.analyzePath('/public/resources').exists) {
+              if (typeof FSRef.mkdirTree === 'function') {
+                FSRef.mkdirTree('/public/resources')
+              } else {
+                FSRef.mkdir('/public/resources')
+              }
+            }
+            if (!FSRef.analyzePath('/resources').exists) {
+              FSRef.mkdir('/resources')
+            }
+          } catch (dirErr) {
+            console.warn('Failed to ensure VFS asset directories:', dirErr)
+          }
         }
       } catch (err) {
         console.error('IDBFS mount failed:', err)
@@ -213,58 +248,111 @@ function SharedWebGPUCanvas({
     moduleConfig.canvas = canvas
     moduleConfig.onRuntimeInitialized = () => {
       previousRuntimeInit?.()
-      globalState.moduleReady = true
-      setModuleReady(true)
-      setIsLoading(false)
-      setError(null)
-      syncCanvasSizing()
 
-       // Sync IDBFS and seed database if needed.
-       try {
-         const FSRef = (typeof globalThis !== 'undefined' && globalThis.FS) || (typeof window !== 'undefined' && window.FS)
-         if (FSRef) {
-           FSRef.syncfs(true, () => {
-             try {
-               const destPath = `/database/${DB_NAME}`
-               const seedPath = `/seed/${DB_NAME}`
-               const destExists = FSRef.analyzePath(destPath).exists
-               const seedExists = FSRef.analyzePath(seedPath).exists
+      // Configure resource base for Emscripten-side fetches, e.g. emscripten_fetch("resources/...")
+      try {
+        const basePrefix = (import.meta.env.BASE_URL || '/').toString()
+        const normalized = basePrefix.endsWith('/') ? basePrefix : basePrefix + '/'
+        const resourceBasePath = `${normalized}resources/` // e.g. "/resources/" or "/app/resources/"
+        // Always expose resource base for C++ via Module property
+        window.Module = window.Module || {}
+        window.Module.resource_base = resourceBasePath
+        if (typeof window.Module.set_resource_base === 'function') {
+          window.Module.set_resource_base(resourceBasePath)
+        } else {
+          console.warn('Module.set_resource_base is not available')
+        }
+        console.log('[WebGPU] Resource base prepared:', resourceBasePath)
+      } catch (e) {
+        console.warn('[WebGPU] Failed to configure resource base:', e)
+      }
 
-               const writeAndPersist = (data) => {
-                 try {
-                   FSRef.writeFile(destPath, data)
-                   FSRef.syncfs(false, () => {})
-                   console.log(`[WebGPU] Seeded database ${DB_NAME} to IDBFS.`)
-                 } catch (e) {
-                   console.error('Writing seeded DB failed:', e)
-                 }
-               }
+      const finalizeReady = () => {
+        // Pre-size canvas without invoking WASM-side resize yet.
+        try {
+          const canvas = canvasRef.current
+          if (canvas) {
+            const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
+            const intrinsicWidth = Math.max(1, Math.round(width * dpr))
+            const intrinsicHeight = Math.max(1, Math.round(height * dpr))
+            applyCanvasSizing(canvas, width, height, intrinsicWidth, intrinsicHeight)
+          }
+        } catch (err) {
+          console.warn('Canvas pre-size failed:', err)
+        }
 
-               if (!destExists) {
-                 if (seedExists) {
-                   // Embedded via --preload-file
-                   const data = FSRef.readFile(seedPath)
-                   writeAndPersist(data)
-                 } else {
-                   // Fallback fetch from /seed/ served publicly
-                   fetch(`/seed/${DB_NAME}`)
-                     .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.statusText))) )
-                     .then((buf) => writeAndPersist(new Uint8Array(buf)))
-                     .catch((err) => {
-                       console.warn(`[WebGPU] No seed database found at /seed/${DB_NAME}:`, err)
-                     })
-                 }
-               } else {
-                 console.log(`[WebGPU] Existing database found: ${destPath}`)
-               }
-             } catch (seedErr) {
-               console.error('Database seed logic error:', seedErr)
-             }
-           })
-         }
-       } catch (syncErr) {
-         console.error('IDBFS sync/seed failed:', syncErr)
-       }
+        // Mark module ready and clear loading
+        const gs = ensureGlobalState()
+        gs.moduleReady = true
+        setModuleReady(true)
+        setIsLoading(false)
+        setError(null)
+
+        // Delay WASM-side resize to avoid overlapping async model load
+        setTimeout(() => {
+          try {
+            syncCanvasSizing()
+          } catch (err) {
+            console.warn('Deferred resize failed:', err)
+          }
+        }, 1000)
+      }
+
+      // Sync IDBFS and seed database if needed before signaling ready
+      try {
+        const FSRef = (typeof globalThis !== 'undefined' && globalThis.FS) || (typeof window !== 'undefined' && window.FS)
+        if (FSRef) {
+          FSRef.syncfs(true, () => {
+            try {
+              const destPath = `/database/${DB_NAME}`
+              const seedPath = `/seed/${DB_NAME}`
+              const destExists = FSRef.analyzePath(destPath).exists
+              const seedExists = FSRef.analyzePath(seedPath).exists
+
+              const writeAndPersist = (data, done) => {
+                try {
+                  FSRef.writeFile(destPath, data)
+                  FSRef.syncfs(false, () => {
+                    console.log(`[WebGPU] Seeded database ${DB_NAME} to IDBFS.`)
+                    done?.()
+                  })
+                } catch (e) {
+                  console.error('Writing seeded DB failed:', e)
+                  done?.()
+                }
+              }
+
+              if (!destExists) {
+                if (seedExists) {
+                  // Embedded via --preload-file
+                  const data = FSRef.readFile(seedPath)
+                  writeAndPersist(data, finalizeReady)
+                } else {
+                  // Fallback fetch from /seed/ served publicly
+                  fetch(`/seed/${DB_NAME}`)
+                    .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.statusText))))
+                    .then((buf) => writeAndPersist(new Uint8Array(buf), finalizeReady))
+                    .catch((err) => {
+                      console.warn(`[WebGPU] No seed database found at /seed/${DB_NAME}:`, err)
+                      finalizeReady()
+                    })
+                }
+              } else {
+                console.log(`[WebGPU] Existing database found: ${destPath}`)
+                finalizeReady()
+              }
+            } catch (seedErr) {
+              console.error('Database seed logic error:', seedErr)
+              finalizeReady()
+            }
+          })
+        } else {
+          finalizeReady()
+        }
+      } catch (syncErr) {
+        console.error('IDBFS sync/seed failed:', syncErr)
+        finalizeReady()
+      }
     }
     moduleConfig.onAbort = (what) => {
       previousAbort?.(what)
@@ -292,6 +380,7 @@ function SharedWebGPUCanvas({
       document.body.appendChild(script)
       globalState.scriptAppended = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setError, setIsLoading, setModuleReady, syncCanvasSizing])
 
   const rootClassName = ['webgpu-canvas-container', className].filter(Boolean).join(' ')
