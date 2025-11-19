@@ -7,6 +7,8 @@ import MainPage from './pages/MainPage.jsx'
 import Auctions from './pages/Auctions.jsx'
 import AuctionView from './pages/AuctionView.jsx'
 import Viewer3D from './pages/Viewer3D.jsx'
+import RegisterPage from './pages/RegisterPage'
+import LoginPage from './pages/LoginPage.jsx'
 import { WebGPUCanvasProvider } from './components/WebGPUCanvasProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -21,6 +23,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="/auctionview" element={<AuctionView />} />
           <Route path="/viewer3d" element={<Viewer3D />} />
           <Route path="/3d" element={<Viewer3D />} />
+          <Route path ="/register" element ={<RegisterPage />} />
+          <Route path ="/login" element ={<LoginPage />} />
           <Route path="*" element={<MainPage />} />
         </Routes>
       </WebGPUCanvasProvider>
