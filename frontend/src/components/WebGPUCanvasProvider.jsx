@@ -392,11 +392,14 @@ function SharedWebGPUCanvas({
           ref={canvasRef}
           tabIndex="-1"
           onContextMenu={(e) => e.preventDefault()}
-          className="block bg-black rounded-lg shadow-lg"
+          // was: className="block bg-black rounded-lg shadow-lg"
+          className="block bg-transparent rounded-lg shadow-lg"
           style={{
             width: `${width}px`,
             height: `${height}px`,
-            maxWidth: '100%'
+            maxWidth: '100%',
+            // ensure inline transparency even if classes change
+            backgroundColor: 'transparent'
           }}
         />
 
