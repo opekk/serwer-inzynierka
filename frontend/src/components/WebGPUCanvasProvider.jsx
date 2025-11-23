@@ -646,6 +646,11 @@ export function WebGPUCanvasProvider({ children }) {
   )
 }
 
+// Try to drive shader time or model matrix from JS when the WASM module is ready.
+// This effect is non-invasive: it will attempt several known API names on
+// `window.Module` and fall back to a visual CSS rotate if nothing is available.
+
+
 export function useWebGPUCanvasInternal() {
   const context = useContext(WebGPUCanvasContext)
   if (!context) {

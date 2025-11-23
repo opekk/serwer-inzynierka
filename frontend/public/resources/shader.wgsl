@@ -62,14 +62,14 @@ struct lighting_uniforms
 @vertex
 fn vs_main(in: vertex_input) -> vertex_output 
 {
-	var out: vertex_output;
+    var out: vertex_output;
   let world_position = u_my_uniforms.model_matrix * vec4f(in.position, 1.0); 
-	out.position = u_my_uniforms.projection_matrix * u_my_uniforms.view_matrix * world_position;
+    out.position = u_my_uniforms.projection_matrix * u_my_uniforms.view_matrix * world_position;
   out.tangent = (u_my_uniforms.model_matrix * vec4f(in.tangent, 0.0)).xyz;
   out.bitangent = (u_my_uniforms.model_matrix * vec4f(in.bitangent, 0.0)).xyz;
   out.normal = (u_my_uniforms.model_matrix * vec4f(in.normal, 0.0)).xyz;
   out.color = in.color;
-	out.uv = in.uv;
+    out.uv = in.uv;
   out.view_direction = u_my_uniforms.camera_world_position - world_position.xyz;
   return out;
 }

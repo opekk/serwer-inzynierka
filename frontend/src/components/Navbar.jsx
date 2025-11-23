@@ -74,12 +74,12 @@ export default function Navbar() {
 
                     {/* Desktop Auth Buttons */}
                     <div className="hidden lg:flex items-center space-x-2 xl:space-x-3 transition-all duration-300">
-                        <button className="px-3 xl:px-4 py-2 text-slate-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:scale-105">
+                        <Link to="/login" className="px-3 xl:px-4 py-2 text-slate-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:scale-105">
                             Zaloguj się
-                        </button>
-                        <button className="px-4 xl:px-5 py-2 text-white bg-indigo-700 hover:bg-indigo-800 rounded-xl transition-all duration-200 hover:scale-105">
+                        </Link>
+                        <Link to="/register" className="px-4 xl:px-5 py-2 text-white bg-indigo-700 hover:bg-indigo-800 rounded-xl transition-all duration-200 hover:scale-105">
                             Zarejestruj się
-                        </button>
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -164,12 +164,12 @@ export default function Navbar() {
                         </div>
                         <div className="pt-4 pb-3 border-t border-gray-200">
                             <div className="px-2 space-y-2">
-                                <button className="w-full px-4 py-2 text-slate-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:scale-[1.02]">
+                                <Link to="/login" onClick={() => toggleMenu()} className="block w-full text-center px-4 py-2 text-slate-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:scale-[1.02]">
                                     Zaloguj się
-                                </button>
-                                <button className="w-full px-5 py-2 text-white bg-indigo-700 hover:bg-indigo-800 rounded-xl transition-all duration-200 hover:scale-[1.02]">
+                                </Link>
+                                <Link to="/register" onClick={() => toggleMenu()} className="block w-full mt-2 text-center px-5 py-2 text-white bg-indigo-700 hover:bg-indigo-800 rounded-xl transition-all duration-200 hover:scale-[1.02]">
                                     Zarejestruj się
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

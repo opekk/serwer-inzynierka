@@ -8,12 +8,23 @@ export default function RegisterPage() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      <main className="flex-1 bg-gradient-to-br from-sky-500 via-indigo-600 to-purple-700">
-        <div className="max-w-7xl mx-auto px-6 py-16 flex items-center justify-center min-h-[calc(100vh-200px)]">
-          
-          <div className="w-full max-w-2xl">
-            {/* Register Card */}
-            <div className="bg-white rounded-2xl shadow-2xl p-8">
+      <main
+        className="flex-1 relative"
+        style={{
+          backgroundImage: "url('/resources/marmurphotos/marmur4.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#3B82F6',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/30 mix-blend-multiply" aria-hidden="true" />
+        <div className="relative z-10">
+          <div className="max-w-7xl mx-auto px-6 py-16 flex items-center justify-center min-h-[calc(100vh-200px)]">
+
+            <div className="w-full max-w-2xl">
+              {/* Register Card */}
+              <div className="bg-white rounded-2xl shadow-2xl p-8">
               
               {/* Header */}
               <div className="text-center mb-8">
@@ -166,6 +177,7 @@ export default function RegisterPage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </main>
 

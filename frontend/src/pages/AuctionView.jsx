@@ -5,8 +5,18 @@ import WebGPUCanvas from '../components/WebGPUCanvas';
 
 export default function AuctionView() {
  return (
-    <div className="flex flex-col">
+    <div
+      className="relative flex flex-col min-h-screen"
+      style={{
+        backgroundImage: "url('/resources/marmurphotos/marmur7.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#3B82F6',
+      }}
+    >
       <Navbar />
+      <div className="flex-1 overflow-auto">
       {/* lewy grid na 60% prawy na 40%*/}
         <div className="max-w-7xl mx-auto px-6 py-16 pb-9 grid grid-cols-[2fr_1.3fr] gap-10 w-full">
       <div className="bg-gray-100 rounded-xl shadow-lg">
@@ -98,7 +108,7 @@ export default function AuctionView() {
      </div>
     </div>
 
-     <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-[2fr_1.3fr] gap-10 w-full pt-0">
+    <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-[2fr_1.3fr] gap-10 w-full pt-0">
   <div className="bg-gray-100 rounded-xl shadow-lg p-6 flex flex-col justify-between min-h-[190px]">
     <div>
       <h2 className="text-lg font-semibold border-b border-gray-300 pb-2 mb-4">
@@ -150,6 +160,7 @@ export default function AuctionView() {
   </div>
 </div>
 
+      </div>
       <Footer />
     </div>
   );

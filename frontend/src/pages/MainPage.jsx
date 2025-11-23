@@ -9,6 +9,8 @@ export default function MainPage() {
   const navigate = useNavigate()
   const { changeModel } = useWebGPUCanvas()
 
+  
+
   const handleLicytuj = (modelName) => {
     // Navigate immediately to avoid waiting for large model load.
     navigate('/auctionview')
@@ -25,69 +27,69 @@ export default function MainPage() {
     }, 0)
   }
   return (
-    <div className="flex flex-col">
-      <Navbar />
+    <div
+      className="relative flex flex-col min-h-screen"
+      style={{
+        backgroundImage: "url('/resources/marmurphotos/marmur1l.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#3B82F6',
+      }}
+    >
+      
+      <div className="absolute inset-0 bg-blue-900/30 mix-blend-multiply" aria-hidden="true" />
+      <div className="relative z-10">
+        <Navbar />
  
-        <section className="bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-700 text-white">
+        <section className="bg-transparent text-slate-900">
           <div className="max-w-7xl mx-auto py-24">
 
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="rounded-2xl p-8 bg-white/30 backdrop-blur-md border border-white/20">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
 
-              <div className="space-y-6">
-                <h1 className="text-5xl font-bold">
-                  Przyszłość aukcji<br/>
-                  <span className="text-sky-200">z wizualizacją 3D</span>
-                </h1>
+                <div className="space-y-6">
+                  <h1 className="text-5xl font-bold">
+                    Przyszłość aukcji<br/>
+                    <span className="text-slate-700">z wizualizacją 3D</span>
+                  </h1>
 
-                <p className="text-sky-100 max-w-xl">
-                  Odkryj unikalne dzieła sztuki i antyki w najnowocześniejszej platformie aukcyjnej.
-                  Obejrzyj każdy przedmiot w 3D przed złożeniem oferty.
-                </p>
+                  <p className="text-slate-900 max-w-xl">
+                    Odkryj unikalne dzieła sztuki i antyki w najnowocześniejszej platformie aukcyjnej.
+                    Obejrzyj każdy przedmiot w 3D przed złożeniem oferty.
+                  </p>
 
-                <div className="flex flex-wrap gap-4">
-                  <Link
-                    to="/auctions"
-                    className="inline-flex items-center px-5 py-3 bg-white text-indigo-700 rounded-lg shadow hover:shadow-lg transition"
-                  >
-                    🔎 Przeglądaj aukcje
-                  </Link>
-                  <Link
-                    to="/viewer3d"
-                    className="inline-flex items-center px-5 py-3 border border-white/60 text-white rounded-lg hover:bg-white/10 transition"
-                  >
-                    ▶ Zobacz demo 3D
-                  </Link>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <article className="w-full max-w-md bg-white/10 rounded-xl p-8 shadow-lg">
-                  <div className="flex flex-col items-center text-center space-y-4">
-
-                    <div className="w-full">
-                      <div className="rounded-lg overflow-hidden border border-white/10 shadow-inner">
-                        {/* Integrated WebGPU Canvas */}
-                        <WebGPUCanvas
-                          width={384}
-                          showControls={false}
-                        />
-                      </div> 
-                    </div>
-
-                    <h3 className="text-xl font-semibold">Interaktywna wizualizacja 3D</h3>
-                    <p className="text-sky-200 text-sm">Obracaj, przybliżaj i poznawaj każdy szczegół przed licytacją.</p>
-
-                    <div className="flex gap-3 mt-2">
-                      <span className="text-xs bg-white/20 px-3 py-1 rounded-full">WebGPU</span>
-                      <span className="text-xs bg-white/20 px-3 py-1 rounded-full">HD</span>
-                      <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Mobile</span>
-                    </div>
+                  <div className="flex flex-wrap gap-4">
+                    <Link
+                      to="/auctions"
+                      className="inline-flex items-center px-5 py-3 bg-white text-slate-700 rounded-lg shadow hover:shadow-lg transition"
+                    >
+                      Przeglądaj aukcje
+                    </Link>
+                    <Link
+                      to="/viewer3d"
+                      className="inline-flex items-center px-5 py-3 border border-white/40 text-slate-900 rounded-lg bg-white/10 hover:bg-white/20 transition"
+                    >
+                      Zobacz demo 3D
+                    </Link>
                   </div>
-                </article>
+                </div>
+
+                <div className="flex justify-start">
+                  <div className="w-full md:w-auto md:pl-4">
+                    {/* Integrated WebGPU Canvas — większa ramka i lepsze wyrównanie */}
+                    <WebGPUCanvas
+                      width={640}
+                      showControls={false}
+                      className="rounded-xl shadow-2xl"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
+        
 
 
 
@@ -232,6 +234,7 @@ export default function MainPage() {
 
 
     <Footer />
+    </div>
     </div>
   )
 }

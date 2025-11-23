@@ -4,3 +4,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* prosty zoom na 80% przegladary bo ladniej wyglada (dziala w chrome i edge nwm jak gdzie indziej) */
+html {
+    zoom: 80%;
+}
+
+
+/* coopilot ustawil brak ramki w obiekcie 3d */
+/* Hide visible frame/shadow/rounded corners for the 3D canvas (non-invasive override).
+     Keeps canvas visually neutral without editing component files. */
+.webgpu-canvas-container,
+.webgpu-canvas-slot-anchor,
+.webgpu-canvas-container canvas {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* Hide overlay backgrounds (loader / error) so nothing covers the canvas */
+.webgpu-canvas-container .absolute.inset-0 {
+    background: transparent !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+}
+
+/* Neutralize any inner visual styles from host */
+.webgpu-canvas-slot-anchor * {
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Global layout: ensure the document and app root fill the viewport and act
+   as a column flex container. Make the app root grow so footer can sit at the
+   bottom when content is short while the page's main content scrolls internally. */
+html, body {
+    height: 100%;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#root {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure the app's top-level child grows to fill available space so footer
+   can be pushed to the bottom. This is robust regardless of intermediate
+   provider/wrapper components. */
+#root > * {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Footer stays at the bottom of the app when content is short. */
+#root footer {
+    margin-top: auto;
+}
