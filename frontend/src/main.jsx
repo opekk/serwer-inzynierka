@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './styles/index.css'
+// import tw-elements CSS to enable theme utility classes like `bg-primary`
+import 'tw-elements/css/tw-elements.min.css'
 import TestPage from './pages/TestPage.jsx'
 import MainPage from './pages/MainPage.jsx'
 import Auctions from './pages/Auctions.jsx'

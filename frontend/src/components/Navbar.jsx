@@ -167,7 +167,7 @@ export default function Navbar() {
                                 <Link to="/login" onClick={() => toggleMenu()} className="block w-full text-center px-4 py-2 text-slate-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:scale-[1.02]">
                                     Zaloguj się
                                 </Link>
-                                <Link to="/register" onClick={() => toggleMenu()} className="block w-full mt-2 text-center px-5 py-2 text-white bg-indigo-700 hover:bg-indigo-800 rounded-xl transition-all duration-200 hover:scale-[1.02]">
+                                <Link to="/register" onClick={() => toggleMenu()} className="block w-full mt-2 text-center px-5 py-2 text-white bg-indigo-900 hover:bg-indigo-800 rounded-xl transition-all duration-200 hover:scale-[1.02]">
                                     Zarejestruj się
                                 </Link>
                             </div>

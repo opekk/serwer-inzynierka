@@ -2,6 +2,7 @@ import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import WebGPUCanvas from '../components/WebGPUCanvas'
+import AuctionCard from '../components/AuctionCard'
 import { Link, useNavigate } from 'react-router-dom'
 import { useWebGPUCanvas } from '../components/WebGPUCanvasProvider.jsx'
 
@@ -45,30 +46,74 @@ export default function MainPage() {
         <section className="bg-transparent text-slate-900">
           <div className="max-w-7xl mx-auto py-24">
 
-            <div className="rounded-2xl p-8 bg-white/30 backdrop-blur-md border border-white/20">
+            <div
+              className="relative overflow-visible rounded-l-2xl rounded-r-none p-8 bg-white/30 backdrop-blur-md"
+              style={{ borderLeftWidth: '8px', borderLeftStyle: 'solid', borderLeftColor: '#bfa873' }}
+            >
+              {/* prawy-gorny potem prawy-dolny corner */}
+              <svg
+                className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-7 h-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M2 0 H24" stroke="#000" strokeWidth="4.8" strokeLinecap="square" />
+                <path d="M24 0 V20" stroke="#000" strokeWidth="4.8" strokeLinecap="square" />
+              </svg>
+              <svg
+                className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-7 h-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M2 24 H24" stroke="#000" strokeWidth="4.8" strokeLinecap="square" />
+                <path d="M24 2 V24" stroke="#000" strokeWidth="4.8" strokeLinecap="square" />
+              </svg>
               <div className="grid md:grid-cols-2 gap-8 items-center">
 
                 <div className="space-y-6">
-                  <h1 className="text-5xl font-bold">
+                  <h1 className="text-6xl font-bold" style={{ letterSpacing: '0.02em' }}>
                     Przyszłość aukcji<br/>
-                    <span className="text-slate-700">z wizualizacją 3D</span>
+                    <span className="text-slate-700 text-6xl">z wizualizacją 3D</span>
                   </h1>
 
-                  <p className="text-slate-900 max-w-xl">
-                    Odkryj unikalne dzieła sztuki i antyki w najnowocześniejszej platformie aukcyjnej.
-                    Obejrzyj każdy przedmiot w 3D przed złożeniem oferty.
-                  </p>
+                  <div className="relative max-w-xl">
+                    {/* lewa klamra */}
+                    <svg
+                      className="absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-48 pointer-events-none"
+                      viewBox="0 0 24 48"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path d="M16 6 H6 M6 6 V42 M6 42 H16" stroke="#ffffff" strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter" />
+                    </svg>
+
+                    <p className="text-slate-900 text-lg italic relative z-10">
+                      Odkryj unikalne dzieła sztuki i antyki w najnowocześniejszej platformie aukcyjnej.
+                      Obejrzyj każdy przedmiot w 3D przed złożeniem oferty.
+                    </p>
+
+                    {/* prawa klamra */}
+                    <svg
+                      className="absolute -right-1 top-1/2 -translate-y-1/2 w-12 h-48 pointer-events-none"
+                      viewBox="0 0 24 48"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path d="M8 6 H18 M18 6 V42 M18 42 H8" stroke="#ffffff" strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter" />
+                    </svg>
+                  </div>
 
                   <div className="flex flex-wrap gap-4">
                     <Link
                       to="/auctions"
-                      className="inline-flex items-center px-5 py-3 bg-white text-slate-700 rounded-lg shadow hover:shadow-lg transition"
+                      className="inline-flex font-bold items-center px-5 py-3 bg-white text-slate-700 rounded-lg shadow hover:shadow-lg transition"
                     >
                       Przeglądaj aukcje
                     </Link>
                     <Link
                       to="/viewer3d"
-                      className="inline-flex items-center px-5 py-3 border border-white/40 text-slate-900 rounded-lg bg-white/10 hover:bg-white/20 transition"
+                      className="inline-flex font-bold items-center px-5 py-3 border border-white/40 text-slate-900 rounded-lg bg-white/40 hover:bg-white/5n0 transition"
                     >
                       Zobacz demo 3D
                     </Link>
@@ -77,7 +122,7 @@ export default function MainPage() {
 
                 <div className="flex justify-start">
                   <div className="w-full md:w-auto md:pl-4">
-                    {/* Integrated WebGPU Canvas — większa ramka i lepsze wyrównanie */}
+                    {/* Integrated WebGPU Canvas */}
                     <WebGPUCanvas
                       width={640}
                       showControls={false}
@@ -99,12 +144,23 @@ export default function MainPage() {
         <div className="max-w-7xl mx-auto h-180">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <h1 className="text-4xl font-bold pt-10">
-            Aukcje na żywo<br/>
+            Aukcje na żywo:<br/>
             <span className="text-gray-700 font-normal text-2xl">Aktualne licytacje z wizualizacją 3D</span>
           </h1>
 
-          <div className="text-black flex justify-end pt-10">
-            <span className="text-2s bg-red-400 px-6 py-3 rounded-full">🔴12 aukcji na żywo</span>
+          <div className="flex justify-end pt-10 items-center gap-4">
+            <div className="relative inline-flex items-center w-fit">
+              <div className="absolute -top-2 -right-3 z-10 inline-flex items-center justify-center rounded-full bg-red-600 px-3 py-1.5 text-center text-xs font-bold text-white">
+                12
+              </div>
+              <button
+                type="button"
+                className="inline-block rounded-full bg-red-500 px-8 py-2 text-sm font-medium text-white shadow transition duration-150 ease-in-out hover:bg-red-600 focus:outline-none"
+              >
+                Na żywo
+              </button>
+            </div>
+
             <Link
               to="/auctions"
               className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium pl-3"
@@ -115,51 +171,36 @@ export default function MainPage() {
           </div>
         </div>
 
-          <div className="grid grid-cols-3 gap-6 p-6 pt-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 pt-20">
+            <AuctionCard
+              image="https://tecdn.b-cdn.net/img/new/standard/nature/186.jpg"
+              title="Przedmiot 1"
+              description="Some quick example text to build on the card title and make up the bulk of the card's content."
+              onBid={() => handleLicytuj('fourareen')}
+              buttonText="Licytuj teraz"
+            />
 
-          <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center">
-          <div className="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
-            <h3 className="text-lg font-semibold">Przedmiot 1</h3>
-            <p className="text-gray-500 mb-4">Dom aukcyjny 1</p>
-            <button
-              onClick={() => handleLicytuj('fourareen')}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
-            >
-              Licytuj teraz
-            </button>
-          </div>  
-          
+            <AuctionCard
+              image="https://tecdn.b-cdn.net/img/new/standard/nature/186.jpg"
+              title="Przedmiot 2"
+              description="Some quick example text to build on the card title and make up the bulk of the card's content."
+              onBid={() => handleLicytuj('hunter')}
+              buttonText="Licytuj teraz"
+            />
 
-        <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center">
-          <div className="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
-          <h3 className="text-lg font-semibold">Przedmiot 2</h3>
-          <p className="text-gray-500 mb-4">Dom aukcyjny 2</p>
-          <button
-            onClick={() => handleLicytuj('hunter')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
-          >
-            Licytuj teraz
-          </button>
-        </div>
-
-
-        <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center">
-          <div className="w-full h-60 bg-gray-200 rounded-lg mb-4"></div>
-          <h3 className="text-lg font-semibold">Przedmiot 3</h3>
-          <p className="text-gray-500 mb-4">Dom aukcyjny 3</p>
-          <button
-            onClick={() => handleLicytuj('snow')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
-          >
-            Licytuj teraz
-          </button>
-        </div>
-        </div>
+            <AuctionCard
+              image="https://tecdn.b-cdn.net/img/new/standard/nature/186.jpg"
+              title="Przedmiot 3"
+              description="Some quick example text to build on the card title and make up the bulk of the card's content."
+              onBid={() => handleLicytuj('snow')}
+              buttonText="Licytuj teraz"
+            />
+          </div>
 
     </div>
     </section>
 
-    <section className="bg-gray-800 text-white py-12">
+    <section className="bg-slate-700 text-white py-12">
       <div className="max-w-7xl mx-auto grid grid-cols-4 gap-8 text-center">
         <div>
         <p className="text-3xl font-bold">2456</p>
@@ -184,51 +225,72 @@ export default function MainPage() {
     </section>
 
 
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto text-center px-6">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Dlaczego AuctionHub?</h2>
-        <p className="text-gray-500 mb-12">Nowoczesna technologia spotyka się z tradycją aukcyjną</p>
+    <section
+      className="py-16 relative"
+      style={{
+        backgroundImage: "url('/resources/marmurphotos/marmur1.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-blue-900/25 mix-blend-multiply" aria-hidden="true" />
+      <div className="max-w-7xl mx-auto text-center px-6 relative z-10">
+        <h2 className="text-4xl font-bold text-white mb-2">Dlaczego AuctionHub?</h2>
+        <div className="mx-auto my-4 h-0.5 w-36 rounded-full bg-white/30 shadow-sm" aria-hidden="true" />
+        <p className="text-2xl text-white/90 mb-12">Nowoczesna technologia spotyka się z tradycją aukcyjną</p>
 
-        <div className="grid grid-cols-3 gap-8">
-          <div className="bg-blue-50 rounded-2xl p-8 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/30 backdrop-blur-md border border-white/20 text-white rounded-2xl p-8 shadow-sm">
             <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 text-white text-3xl p-4 rounded-full">
-              🧊
-            </div>
+              <div className="bg-white text-black text-3xl p-4 rounded-full shadow ring-1 ring-slate-200 ring-4 ring-sky-300/20">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-black">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                </svg>
+
+              </div>
             </div>
             <h3 className="text-lg font-semibold mb-2">Wizualizacja 3D WebGPU</h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-white/90 text-s">
               Pierwsza platforma aukcyjna z pełną obsługą modeli 3D w czasie rzeczywistym.
               Obejrzyj każdy przedmiot z każdej strony.
             </p>
           </div>
 
-          <div className="bg-green-50 rounded-2xl p-8 shadow-sm">
+          <div className="bg-white/30 backdrop-blur-md border border-white/20 text-white rounded-2xl p-8 shadow-sm">
             <div className="flex justify-center mb-4">
-            <div className="bg-green-600 text-white text-3xl p-4 rounded-full">
-              ⚡
-            </div>
+              <div className="bg-white text-black text-3xl p-4 rounded-full shadow ring-1 ring-slate-200 ring-4 ring-sky-300/20">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-black">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                </svg>
+
+              </div>
             </div>
             <h3 className="text-lg font-semibold mb-2">Licytacja w czasie rzeczywistym</h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-white/90 text-s">
               Natychmiastowe aktualizacje ofert dla wszystkich uczestników.
               Żadnych opóźnień, pełna transparentność.
             </p>
           </div>
 
-          <div className="bg-purple-50 rounded-2xl p-8 shadow-sm">
+          <div className="bg-white/30 backdrop-blur-md border border-white/20 text-white rounded-2xl p-8 shadow-sm">
             <div className="flex justify-center mb-4">
-              <div className="bg-purple-600 text-white text-3xl p-4 rounded-full">
-                🏛️
+              <div className="bg-white text-black text-3xl p-4 rounded-full shadow ring-1 ring-slate-200 ring-4 ring-sky-300/20">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-black">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-2">Wiele domów aukcyjnych</h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-white/90 text-s">
               Wszystkie najlepsze domy aukcyjne w jednym miejscu.
               Porównuj oferty i wybieraj najlepsze okazje.
             </p>
           </div>
-        </div>
+          </div>
       </div>
     </section>
 
