@@ -296,7 +296,7 @@ export default function MainPage() {
 
 
     <Footer />
-    </div>
+      </div>
     </div>
   )
 }
