@@ -19,8 +19,9 @@ export default function AuctionView() {
       <div className="flex-1 overflow-auto">
       {/* lewy grid na 60% prawy na 40%*/}
         <div className="max-w-7xl mx-auto px-6 py-16 pb-9 grid grid-cols-[2fr_1.3fr] gap-10 w-full">
-      <div className="bg-gray-100 rounded-xl shadow-lg">
-      <div className="flex items-center justify-between p-4 border-black-100">
+      <div className="relative overflow-visible rounded-l-2xl rounded-r-none p-8 bg-white/30 backdrop-blur-md shadow-lg"
+           style={{ borderLeftWidth: '8px', borderLeftStyle: 'solid', borderLeftColor: '#bfa873' }}>
+      <div className="flex items-center justify-between pb-4 border-black-100">
        
         <h2 className="flex items-center gap-2 text-black font-semibold text-lg">
            Wizualizacja 3D (WebGPU)
