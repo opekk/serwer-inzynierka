@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -8,9 +9,18 @@ import { useWebGPUCanvas } from '../components/WebGPUCanvasProvider.jsx'
 
 export default function MainPage() {
   const navigate = useNavigate()
-  const { changeModel } = useWebGPUCanvas()
+  const { changeModel, moduleReady } = useWebGPUCanvas()
 
-  
+  // Change to default model when returning to MainPage
+  useEffect(() => {
+    if (moduleReady && window.Module?.change_model_to_default) {
+      try {
+        window.Module.change_model_to_default()
+      } catch (err) {
+        console.error('Failed to change to default model:', err)
+      }
+    }
+  }, [moduleReady])
 
   const handleLicytuj = (modelName) => {
     // Navigate immediately to avoid waiting for large model load.
