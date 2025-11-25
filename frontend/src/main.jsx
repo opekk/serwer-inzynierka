@@ -17,7 +17,7 @@ import { WebGPUCanvasProvider } from './components/WebGPUCanvasProvider.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-  <WebGPUCanvasProvider>
+      <WebGPUCanvasProvider>
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/main" element={<MainPage />} />
