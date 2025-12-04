@@ -7,7 +7,7 @@ export default function UserPanel() {
     <div
       className="relative flex flex-col min-h-screen"
       style={{
-        backgroundImage: "url('/resources/marmurphotos/marmur5.jpg')",
+        backgroundImage: "url('/resources/marmurphotos/marmur_final.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

@@ -41,7 +41,7 @@ export default function MainPage() {
     <div
       className="relative flex flex-col min-h-screen"
       style={{
-        backgroundImage: "url('/resources/marmurphotos/marmur1l.jpg')",
+        backgroundImage: "url('/resources/marmurphotos/marmur_final.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -238,7 +238,7 @@ export default function MainPage() {
     <section
       className="py-16 relative"
       style={{
-        backgroundImage: "url('/resources/marmurphotos/marmur1.jpg')",
+        backgroundImage: "url('/resources/marmurphotos/marmur_final.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}

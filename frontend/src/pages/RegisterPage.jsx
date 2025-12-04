@@ -110,7 +110,7 @@ export default function RegisterPage() {
       <main
         className="flex-1 relative"
         style={{
-          backgroundImage: "url('/resources/marmurphotos/marmur4.jpg')",
+          backgroundImage: "url('/resources/marmurphotos/marmur_final.webp')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

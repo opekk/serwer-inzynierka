@@ -8,7 +8,7 @@ export default function AuctionView() {
     <div
       className="relative flex flex-col min-h-screen"
       style={{
-        backgroundImage: "url('/resources/marmurphotos/marmur7.jpg')",
+        backgroundImage: "url('/resources/marmurphotos/marmur_final.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
