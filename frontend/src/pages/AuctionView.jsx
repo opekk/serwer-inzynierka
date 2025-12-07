@@ -24,7 +24,7 @@ export default function AuctionView() {
       <div className="flex items-center justify-between pb-4 border-black-100">
        
         <h2 className="flex items-center gap-2 text-black font-semibold text-lg">
-           Wizualizacja 3D (WebGPU)
+           Wizualizacja 3D
         </h2>
         
         <div className="flex items-center gap-2 text-sm">
@@ -48,27 +48,19 @@ export default function AuctionView() {
           />
       </div>
 
-      
-      
-      
-      <div className="flex items-center justify-between text-xs text-black px-4 py-2 text-lg">
-        <span>Jakość renderowania: Ultra HD</span>
-        
-        <span>WebGPU aktywne</span>
-      </div>
     </div>
      
      <div className="bg-gray-100 rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold mb-4 pb-2 border-b border-gray-300">Nazwa przedmiotu xasea</h3>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b border-gray-300">Retro Telefon Tarczowy Wieża Eiffla</h3>
         <div className="bg-white/40 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 leading-relaxed mb-6">
         <p className="mb-1">
         <span className="font-semibold text-gray-800">Numer aukcji:</span> #3214156
         </p>
           <p className="mb-1">
-          <span className="font-semibold text-gray-800">Zakończenie:</span> 13 styczen 2025, 19:45
+          <span className="font-semibold text-gray-800">Zakończenie:</span> 13 stycznia 2025, 19:45
           </p>
             <p>
-            <span className="font-semibold text-gray-800">Kategoria:</span> Przedmioty typu spoko
+            <span className="font-semibold text-gray-800">Kategoria:</span> Antyki i Kolekcje
             </p>
       </div>
 
@@ -117,20 +109,21 @@ export default function AuctionView() {
       </h2>
       <div className="bg-white/40 rounded-lg p-4 border border-gray-200 text-gray-700">
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-          ullamcorper, mi vitae commodo vestibulum, urna urna vestibulum
-          sapien, nec elementum purus nibh at elit. Suspendisse at nulla
-          luctus, aliquam ipsum sit amet, gravida est. Integer ut mattis
-          libero. Donec feugiat accumsan magna, a fringilla libero convallis
-          ut.
+          Unikalny zabytkowy telefon tarczowy z dekoracyjnym motywem Wieży Eiffla - prawdziwa perełka dla kolekcjonerów.
+          Ten wyjątkowy egzemplarz w stylu retro pochodzi z lat 80. XX wieku i łączy funkcjonalność
+          z artystycznym wzornictwem inspirowanym słynnym paryskim symbolem. Telefon jest w pełni sprawny,
+          z zachowanym oryginalnym mechanizmem tarczowym. Metalowe wykończenie z motywem Wieży Eiffla
+          nadaje mu autentyczny, vintage'owy charakter.
         </p>
         <div className="mt-3">
           <h5 className="font-semibold mb-1">Szczegółowe dane techniczne:</h5>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-            ullamcorper, mi vitae commodo vestibulum, urna urna vestibulum
-            sapien, nec (ewentualnie lista)
-          </p>
+          <ul className="list-disc list-inside text-sm text-gray-600 mt-2 space-y-1">
+            <li>Wysokość: ok. 35 cm</li>
+            <li>Mechanizm: tarczowy, w pełni sprawny</li>
+            <li>Materiał: metal z wykończeniem brązowym</li>
+            <li>Stan: bardzo dobry, niewielkie ślady użytkowania</li>
+            <li>Pochodzenie: lata 80. XX wieku</li>
+          </ul>
         </div>
       </div>
     </div>

@@ -202,7 +202,7 @@ export default function MainPage() {
               image="https://tecdn.b-cdn.net/img/new/standard/nature/186.jpg"
               title="Przedmiot 3"
               description="Some quick example text to build on the card title and make up the bulk of the card's content."
-              onBid={() => handleLicytuj('snow')}
+              onBid={() => handleLicytuj('telephone')}
               buttonText="Licytuj teraz"
             />
           </div>
