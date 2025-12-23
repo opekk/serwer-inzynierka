@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../Models/User.js';
+import { sendErrorResponse, sendSuccessResponse } from '../utils/errorHandler.js';
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -87,11 +88,7 @@ export const register = async (req, res) => {
       });
     }
 
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas rejestracji',
-      error: error.message
-    });
+    return sendErrorResponse(res, 500, 'Błąd podczas rejestracji', error);
   }
 };
 
@@ -127,11 +124,7 @@ export const login = async (req, res) => {
 
     createSendToken(user, 200, res, 'Zalogowano pomyślnie');
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas logowania',
-      error: error.message
-    });
+    return sendErrorResponse(res, 500, 'Błąd podczas logowania', error);
   }
 };
 

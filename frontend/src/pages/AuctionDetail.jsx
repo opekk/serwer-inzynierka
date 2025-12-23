@@ -1,11 +1,12 @@
 import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import '../styles/index.css'
+import { auctionAPI } from '../services/api'
+import { AuthContext } from '../contexts/AuthContext'
+import { formatDate, formatTimeRemaining } from '../utils/dateHelpers'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import WebGPUCanvas from '../components/WebGPUCanvas'
-import { auctionAPI } from '../services/api'
-import { AuthContext } from '../contexts/AuthContext'
+import '../styles/index.css'
 
 export default function AuctionDetail() {
   const { id } = useParams()
@@ -106,32 +107,6 @@ export default function AuctionDetail() {
     } finally {
       setBidding(false)
     }
-  }
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleString('pl-PL', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  const formatTimeRemaining = (endTime) => {
-    const now = new Date()
-    const end = new Date(endTime)
-    const diff = end - now
-
-    if (diff <= 0) return 'Zakończona'
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-
-    if (days > 0) return `${days}d ${hours}h ${minutes}m`
-    if (hours > 0) return `${hours}h ${minutes}m`
-    return `${minutes}m`
   }
 
   if (loading) {

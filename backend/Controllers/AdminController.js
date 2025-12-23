@@ -1,7 +1,8 @@
+import mongoose from 'mongoose';
 import Auction from '../Models/Auction.js';
 import Bid from '../Models/Bid.js';
 import User from '../Models/User.js';
-import mongoose from 'mongoose';
+import { sendErrorResponse, sendSuccessResponse } from '../utils/errorHandler.js';
 
 // ============================================
 // DASHBOARD & STATISTICS

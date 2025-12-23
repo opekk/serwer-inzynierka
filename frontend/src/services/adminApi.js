@@ -1,31 +1,6 @@
+import { handleResponse, getAuthHeaders } from '../utils/apiHelpers';
+
 const API_URL = 'http://localhost:8080/api';
-
-// Helper function to handle API responses
-const handleResponse = async (response) => {
-  let data;
-  try {
-    data = await response.json();
-  } catch (err) {
-    console.error('JSON parse error:', err);
-    throw new Error('Invalid response from server');
-  }
-
-  if (!response.ok) {
-    console.error('API Error:', { status: response.status, data });
-    throw new Error(data.message || 'Something went wrong');
-  }
-
-  return data;
-};
-
-// Helper function to get auth headers
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-};
 
 // Admin API calls
 export const adminAPI = {

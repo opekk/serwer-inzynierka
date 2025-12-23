@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import '../styles/index.css'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import { auctionAPI } from '../services/api'
 import { AuthContext } from '../contexts/AuthContext'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import '../styles/index.css'
 
 export default function CreateAuction() {
   const navigate = useNavigate()

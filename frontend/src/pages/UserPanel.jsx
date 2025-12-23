@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import '../styles/index.css'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import { useAuth } from '../contexts/AuthContext'
 import { auctionAPI, bidAPI } from '../services/api'
+import { getYear } from '../utils/dateHelpers'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import '../styles/index.css'
 
 export default function UserPanel() {
   const { user, isAuthenticated } = useAuth()
@@ -12,6 +13,7 @@ export default function UserPanel() {
   const [watchlist, setWatchlist] = useState([])
   const [recentBids, setRecentBids] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [activeBidsCount, setActiveBidsCount] = useState(0)
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function UserPanel() {
   const fetchUserData = async () => {
     try {
       setLoading(true)
+      setError(null)
 
       // Fetch watchlist
       const watchlistResponse = await auctionAPI.getMyWatchlist()
@@ -46,6 +49,7 @@ export default function UserPanel() {
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
+      setError(error.message || 'Błąd podczas pobierania danych użytkownika')
     } finally {
       setLoading(false)
     }
@@ -75,12 +79,6 @@ export default function UserPanel() {
     return user.username
   }
 
-  // Format member since date
-  const getMemberSince = () => {
-    const date = new Date(user.createdAt)
-    return date.getFullYear()
-  }
-
   // Calculate total spent (sum of won bids)
   const calculateTotalSpent = () => {
     const wonBids = recentBids.filter(bid => bid.status === 'won')
@@ -103,6 +101,26 @@ export default function UserPanel() {
         <Navbar />
 
         <main className="flex-1 overflow-auto max-w-7xl mx-auto px-6 py-10 w-full">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <p className="text-red-600 text-sm font-medium">{error}</p>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-600 hover:text-red-800 transition"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <div style={{ minHeight: 'calc(100vh - 260px)' }} className="w-full flex items-center justify-center py-24">
           <div className="w-full max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -115,7 +133,7 @@ export default function UserPanel() {
                 </div>
                 <div>
                   <div className="text-lg font-bold">{getDisplayName()}</div>
-                  <div className="text-sm text-gray-500">Członek od {getMemberSince()}</div>
+                  <div className="text-sm text-gray-500">Członek od {getYear(user.createdAt)}</div>
                 </div>
               </div>
 
@@ -138,7 +156,7 @@ export default function UserPanel() {
                 <div>
                   <h1 className="text-2xl font-bold">{getDisplayName()}</h1>
                   <p className="text-sm text-slate-600">
-                    {user.email} • Członek od {getMemberSince()}
+                    {user.email} • Członek od {getYear(user.createdAt)}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

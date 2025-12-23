@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
 import './styles/index.css'
 // import tw-elements CSS to enable theme utility classes like `bg-primary`
 import 'tw-elements/css/tw-elements.min.css'
@@ -20,36 +21,44 @@ import AdminAuctions from './pages/admin/AdminAuctions.jsx'
 import AdminBids from './pages/admin/AdminBids.jsx'
 import { WebGPUCanvasProvider } from './components/WebGPUCanvasProvider.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
+import ErrorFallback from './components/ErrorFallback.jsx'
+
+const handleError = (error, errorInfo) => {
+  console.error('Error caught by boundary:', error);
+  console.error('Error info:', errorInfo);
+};
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <WebGPUCanvasProvider>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/main" element={<MainPage />} />
-            <Route path="/test" element={<TestPage />} />
-            <Route path="/auctions" element={<Auctions />} />
-            <Route path="/auctionview" element={<AuctionView />} />
-            <Route path="/auction/:id" element={<AuctionDetail />} />
-            <Route path="/create-auction" element={<CreateAuction />} />
-            <Route path="/viewer3d" element={<Viewer3D />} />
-            <Route path="/3d" element={<Viewer3D />} />
-            <Route path="/userpanel" element={<UserPanel />} />
-            <Route path ="/register" element ={<RegisterPage />} />
-            <Route path ="/login" element ={<LoginPage />} />
+    <ErrorBoundary FallbackComponent={ErrorFallback} onError={handleError}>
+      <BrowserRouter>
+        <AuthProvider>
+          <WebGPUCanvasProvider>
+            <Routes>
+              <Route path="/" element={<MainPage />} />
+              <Route path="/main" element={<MainPage />} />
+              <Route path="/test" element={<TestPage />} />
+              <Route path="/auctions" element={<Auctions />} />
+              <Route path="/auctionview" element={<AuctionView />} />
+              <Route path="/auction/:id" element={<AuctionDetail />} />
+              <Route path="/create-auction" element={<CreateAuction />} />
+              <Route path="/viewer3d" element={<Viewer3D />} />
+              <Route path="/3d" element={<Viewer3D />} />
+              <Route path="/userpanel" element={<UserPanel />} />
+              <Route path ="/register" element ={<RegisterPage />} />
+              <Route path ="/login" element ={<LoginPage />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/auctions" element={<AdminAuctions />} />
-            <Route path="/admin/bids" element={<AdminBids />} />
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/auctions" element={<AdminAuctions />} />
+              <Route path="/admin/bids" element={<AdminBids />} />
 
-            <Route path="*" element={<MainPage />} />
-          </Routes>
-        </WebGPUCanvasProvider>
-      </AuthProvider>
-    </BrowserRouter>
+              <Route path="*" element={<MainPage />} />
+            </Routes>
+          </WebGPUCanvasProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>,
 )

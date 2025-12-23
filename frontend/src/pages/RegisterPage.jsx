@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import '../styles/index.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import '../styles/index.css';
 
 export default function RegisterPage() {
   const navigate = useNavigate();

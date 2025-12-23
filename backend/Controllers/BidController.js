@@ -1,5 +1,6 @@
-import Bid from '../Models/Bid.js';
 import Auction from '../Models/Auction.js';
+import Bid from '../Models/Bid.js';
+import { sendErrorResponse, sendSuccessResponse } from '../utils/errorHandler.js';
 
 // ============================================
 // PUBLIC ENDPOINTS (No authentication required)

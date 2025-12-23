@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import '../styles/index.css'
+import { auctionAPI } from '../services/api'
+import { formatTimeRemaining } from '../utils/dateHelpers'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import AuctionCard from '../components/AuctionCard'
-import { auctionAPI } from '../services/api'
+import '../styles/index.css'
 
 export default function Auctions() {
   const navigate = useNavigate()
@@ -70,22 +71,6 @@ export default function Auctions() {
       sortOrder: prev.sortBy === sortBy && prev.sortOrder === 'asc' ? 'desc' : 'asc',
       page: 1
     }))
-  }
-
-  const formatTimeRemaining = (endTime) => {
-    const now = new Date()
-    const end = new Date(endTime)
-    const diff = end - now
-
-    if (diff <= 0) return 'Zakończona'
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-
-    if (days > 0) return `${days}d ${hours}h`
-    if (hours > 0) return `${hours}h ${minutes}m`
-    return `${minutes}m`
   }
 
   return (
