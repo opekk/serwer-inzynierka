@@ -277,6 +277,7 @@ export default function RegisterPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition disabled:bg-blue-400 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: loading ? '#60a5fa' : '#2563eb', color: '#ffffff' }}
                   >
                     {loading ? 'Tworzenie konta...' : 'Utwórz konto'}
                   </button>
@@ -288,7 +289,7 @@ export default function RegisterPage() {
                     Masz już konto?{' '}
                     <Link
                       to="/login"
-                      className="text-blue-600 hover:text-blue-800 font-semibold transition"
+                      className="text-blue-500 hover:text-blue-800 font-semibold transition"
                     >
                       Zaloguj się
                     </Link>

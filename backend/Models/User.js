@@ -90,18 +90,6 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: [0, 'Saldo konta nie może być ujemne']
   },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  verificationToken: {
-    type: String,
-    select: false
-  },
-  verificationTokenExpires: {
-    type: Date,
-    select: false
-  },
   role: {
     type: String,
     enum: {
@@ -133,6 +121,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     select: false
   },
+  verificationToken: {
+    type: String,
+    select: false
+  },
+  verificationTokenExpires: {
+    type: Date,
+    select: false
+  },
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
 
   stats: {
     totalAuctionsCreated: {
@@ -154,10 +154,6 @@ const userSchema = new mongoose.Schema({
   },
   // Preferencje użytkownika
   preferences: {
-    emailNotifications: {
-      type: Boolean,
-      default: true
-    },
     smsNotifications: {
       type: Boolean,
       default: false
@@ -306,34 +302,6 @@ userSchema.methods.deductBalance = async function(amount) {
   return this.accountBalance;
 };
 
-// Metoda do generowania tokenu weryfikacyjnego
-userSchema.methods.createVerificationToken = function() {
-  const verificationToken = crypto.randomBytes(32).toString('hex');
-  
-  this.verificationToken = crypto
-    .createHash('sha256')
-    .update(verificationToken)
-    .digest('hex');
-  
-  this.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 godziny
-  
-  return verificationToken;
-};
-
-// Metoda do generowania tokenu resetowania hasła
-userSchema.methods.createPasswordResetToken = function() {
-  const resetToken = crypto.randomBytes(32).toString('hex');
-  
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
-  
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minut
-  
-  return resetToken;
-};
-
 // Metoda do pobierania publicznego profilu użytkownika
 userSchema.methods.getPublicProfile = function() {
   return {
@@ -342,11 +310,47 @@ userSchema.methods.getPublicProfile = function() {
     fullName: this.fullName,
     rating: this.rating,
     ratingCount: this.ratingCount,
-    isVerified: this.isVerified,
+    isVerified: this.isEmailVerified,
     avatar: this.avatar,
     memberSince: this.createdAt,
     stats: this.stats
   };
+};
+
+// Metoda do tworzenia tokenu weryfikacji email
+userSchema.methods.createVerificationToken = function() {
+  // Generuj losowy token
+  const verificationToken = crypto.randomBytes(32).toString('hex');
+
+  // Zahashuj token i zapisz w bazie danych
+  this.verificationToken = crypto
+    .createHash('sha256')
+    .update(verificationToken)
+    .digest('hex');
+
+  // Ustaw czas wygaśnięcia (24 godziny)
+  this.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
+
+  // Zwróć niezahaszowany token (do wysłania użytkownikowi)
+  return verificationToken;
+};
+
+// Metoda do tworzenia tokenu resetowania hasła
+userSchema.methods.createPasswordResetToken = function() {
+  // Generuj losowy token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // Zahashuj token i zapisz w bazie danych
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Ustaw czas wygaśnięcia (1 godzina)
+  this.passwordResetExpires = Date.now() + 60 * 60 * 1000;
+
+  // Zwróć niezahaszowany token (do wysłania użytkownikowi)
+  return resetToken;
 };
 
 // ============================================

@@ -156,6 +156,7 @@ export default function LoginPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition disabled:bg-blue-400 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: loading ? '#60a5fa' : '#2563eb', color: '#ffffff' }}
                   >
                     {loading ? 'Logowanie...' : 'Zaloguj się'}
                   </button>

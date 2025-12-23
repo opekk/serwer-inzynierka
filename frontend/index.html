@@ -4,8 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React</title>
+
     <!-- Preload background image for faster rendering -->
     <link rel="preload" href="/resources/marmurphotos/marmur_final.webp" as="image" type="image/webp" />
+
+    <!-- Keyboard protection for form inputs -->
+    <script>
+      // Protect keyboard input in forms from being captured by WebGPU/Canvas
+      (function() {
+        function isFormElement(target) {
+          if (!target || !target.tagName) return false;
+
+          return (
+            target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.tagName === 'SELECT' ||
+            target.isContentEditable === true ||
+            (target.closest && target.closest('[contenteditable="true"]'))
+          );
+        }
+
+        function handleKeyEvent(e) {
+          if (isFormElement(e.target)) {
+            // Stop ALL propagation including other handlers on same element
+            e.stopImmediatePropagation();
+          }
+        }
+
+        // Add at window level to catch events even earlier, with highest priority
+        window.addEventListener('keydown', handleKeyEvent, true);
+        window.addEventListener('keyup', handleKeyEvent, true);
+        window.addEventListener('keypress', handleKeyEvent, true);
+
+        // Also add at document level as backup
+        document.addEventListener('keydown', handleKeyEvent, true);
+        document.addEventListener('keyup', handleKeyEvent, true);
+        document.addEventListener('keypress', handleKeyEvent, true);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

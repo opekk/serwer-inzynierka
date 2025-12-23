@@ -1,8 +1,92 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useAuth } from '../contexts/AuthContext'
+import { auctionAPI, bidAPI } from '../services/api'
 
 export default function UserPanel() {
+  const { user, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+  const [watchlist, setWatchlist] = useState([])
+  const [recentBids, setRecentBids] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [activeBidsCount, setActiveBidsCount] = useState(0)
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login')
+      return
+    }
+
+    fetchUserData()
+  }, [isAuthenticated, navigate])
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true)
+
+      // Fetch watchlist
+      const watchlistResponse = await auctionAPI.getMyWatchlist()
+      if (watchlistResponse.success) {
+        setWatchlist(watchlistResponse.data || [])
+      }
+
+      // Fetch recent bids
+      const bidsResponse = await bidAPI.getMyBids({ limit: 10, sort: '-createdAt' })
+      if (bidsResponse.success) {
+        setRecentBids(bidsResponse.data || [])
+      }
+
+      // Fetch active bids count
+      const activeBidsResponse = await bidAPI.getMyActiveBids()
+      if (activeBidsResponse.success) {
+        setActiveBidsCount(activeBidsResponse.data?.length || 0)
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Ładowanie...</div>
+      </div>
+    )
+  }
+
+  // Get user initials
+  const getInitials = () => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    }
+    return user.username.substring(0, 2).toUpperCase()
+  }
+
+  // Get display name
+  const getDisplayName = () => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`
+    }
+    return user.username
+  }
+
+  // Format member since date
+  const getMemberSince = () => {
+    const date = new Date(user.createdAt)
+    return date.getFullYear()
+  }
+
+  // Calculate total spent (sum of won bids)
+  const calculateTotalSpent = () => {
+    const wonBids = recentBids.filter(bid => bid.status === 'won')
+    return wonBids.reduce((sum, bid) => sum + bid.amount, 0)
+  }
+
   return (
     <div
       className="relative flex flex-col min-h-screen"
@@ -26,10 +110,12 @@ export default function UserPanel() {
           <aside className="col-span-1">
             <div className="bg-white rounded-xl shadow p-6 sticky top-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-indigo-200 rounded-full flex items-center justify-center text-2xl font-bold text-white">JK</div>
+                <div className="w-16 h-16 bg-indigo-200 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+                  {getInitials()}
+                </div>
                 <div>
-                  <div className="text-lg font-bold">Jan Kowalski</div>
-                  <div className="text-sm text-gray-500">Członek od 2023</div>
+                  <div className="text-lg font-bold">{getDisplayName()}</div>
+                  <div className="text-sm text-gray-500">Członek od {getMemberSince()}</div>
                 </div>
               </div>
 
@@ -50,30 +136,38 @@ export default function UserPanel() {
             <div className="bg-white rounded-xl shadow p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold">Jan Kowalski</h1>
-                  <p className="text-sm text-slate-600">Kolekcjoner sztuki • Członek od 2023</p>
+                  <h1 className="text-2xl font-bold">{getDisplayName()}</h1>
+                  <p className="text-sm text-slate-600">
+                    {user.email} • Członek od {getMemberSince()}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm">Zweryfikowany</span>
+                  {user.isEmailVerified ? (
+                    <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm">Zweryfikowany</span>
+                  ) : (
+                    <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm">Niezweryfikowany</span>
+                  )}
                 </div>
               </div>
 
               <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/5 rounded-lg p-4">
                   <div className="text-sm text-slate-600">Wygrane aukcje</div>
-                  <div className="text-xl font-bold">12</div>
+                  <div className="text-xl font-bold">{user.stats?.totalAuctionsWon || 0}</div>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
                   <div className="text-sm text-slate-600">Aktywne licytacje</div>
-                  <div className="text-xl font-bold">3</div>
+                  <div className="text-xl font-bold">{loading ? '...' : activeBidsCount}</div>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
                   <div className="text-sm text-slate-600">Obserwowane</div>
-                  <div className="text-xl font-bold">28</div>
+                  <div className="text-xl font-bold">{loading ? '...' : watchlist.length}</div>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
-                  <div className="text-sm text-slate-600">Wydane w tym miesiącu</div>
-                  <div className="text-xl font-bold">8,5k zł</div>
+                  <div className="text-sm text-slate-600">Łącznie wydane</div>
+                  <div className="text-xl font-bold">
+                    {loading ? '...' : `${calculateTotalSpent().toLocaleString('pl-PL')} zł`}
+                  </div>
                 </div>
               </div>
             </div>
@@ -82,36 +176,65 @@ export default function UserPanel() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-xl shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Ostatnie aktywności</h3>
-                <ul className="space-y-3">
-                  <li className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">Wazon Ming Dynasty</div>
-                      <div className="text-sm text-gray-500">Twoja oferta: 2,500 zł</div>
-                    </div>
-                    <div className="text-slate-900 font-semibold">WYGRANA</div>
-                  </li>
-                  <li className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">Pierścień Vintage</div>
-                      <div className="text-sm text-gray-500">Twoja oferta: 1,800 zł</div>
-                    </div>
-                    <div className="text-slate-900 font-semibold">PRZEGRANA</div>
-                  </li>
-                </ul>
+                {loading ? (
+                  <div className="text-center py-8 text-gray-500">Ładowanie...</div>
+                ) : recentBids.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">Brak aktywności</div>
+                ) : (
+                  <ul className="space-y-3">
+                    {recentBids.slice(0, 5).map((bid) => (
+                      <li key={bid._id} className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">{bid.auction?.title || 'Aukcja'}</div>
+                          <div className="text-sm text-gray-500">
+                            Twoja oferta: {bid.amount.toLocaleString('pl-PL')} zł
+                          </div>
+                        </div>
+                        <div className={`font-semibold ${
+                          bid.status === 'won'
+                            ? 'text-green-600'
+                            : bid.status === 'lost'
+                            ? 'text-red-600'
+                            : bid.isWinning
+                            ? 'text-blue-600'
+                            : 'text-gray-600'
+                        }`}>
+                          {bid.status === 'won'
+                            ? 'WYGRANA'
+                            : bid.status === 'lost'
+                            ? 'PRZEGRANA'
+                            : bid.isWinning
+                            ? 'PROWADZISZ'
+                            : 'PRZEBITA'}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               <div className="bg-white rounded-xl shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Lista obserwowanych</h3>
-                <ul className="space-y-3">
-                  <li className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-                    <div>Korona Królewska</div>
-                    <div className="text-slate-900 font-semibold">12,500 zł</div>
-                  </li>
-                  <li className="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-                    <div>Zegarek Pocket</div>
-                    <div className="text-slate-900 font-semibold">850 zł</div>
-                  </li>
-                </ul>
+                {loading ? (
+                  <div className="text-center py-8 text-gray-500">Ładowanie...</div>
+                ) : watchlist.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">Brak obserwowanych aukcji</div>
+                ) : (
+                  <ul className="space-y-3">
+                    {watchlist.slice(0, 5).map((auction) => (
+                      <li
+                        key={auction._id}
+                        className="p-3 bg-gray-50 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-100 transition"
+                        onClick={() => navigate(`/auction/${auction._id}`)}
+                      >
+                        <div className="font-medium">{auction.title}</div>
+                        <div className="text-slate-900 font-semibold">
+                          {auction.currentPrice.toLocaleString('pl-PL')} zł
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </section>

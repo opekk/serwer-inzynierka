@@ -48,8 +48,12 @@ export default function Navbar() {
                         <Link to="/main" className="text-slate-500 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-400 transition-all duration-200">Strona Główna</Link>
                         <Link to="/auctions" className="text-slate-500 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-400 transition-all duration-200">Aukcje na żywo</Link>
                         <Link to="/viewer3d" className="text-slate-500 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-400 transition-all duration-200">Przeglądarka 3D</Link>
-                        <a href="#" className="text-slate-500 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-400 transition-all duration-200">Kategorie</a>
-                        <a href="#" className="text-slate-500 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-400 transition-all duration-200">Domy Aukcyjne</a>
+                        {isAuthenticated && (
+                            <Link to="/create-auction" className="text-slate-500 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-blue-400 transition-all duration-200">Utwórz Aukcję</Link>
+                        )}
+                        {user?.role === 'admin' && (
+                            <Link to="/admin" className="text-purple-600 px-2 xl:px-4 py-2 hover:underline hover:underline-offset-6 hover:text-purple-700 font-semibold transition-all duration-200">⚙️ Admin Panel</Link>
+                        )}
                     </div>
 
                     <div className="hidden lg:flex items-center space-x-2 xl:space-x-3 transition-all duration-300">
@@ -126,20 +130,24 @@ export default function Navbar() {
                             >
                                 Przeglądarka 3D
                             </Link>
-                            <a
-                                href="#"
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
-                                onClick={() => toggleMenu()}
-                            >
-                                Kategorie
-                            </a>
-                            <a
-                                href="#"
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
-                                onClick={() => toggleMenu()}
-                            >
-                                Domy Aukcyjne
-                            </a>
+                            {isAuthenticated && (
+                                <Link
+                                    to="/create-auction"
+                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200 hover:translate-x-1"
+                                    onClick={() => toggleMenu()}
+                                >
+                                    Utwórz Aukcję
+                                </Link>
+                            )}
+                            {user?.role === 'admin' && (
+                                <Link
+                                    to="/admin"
+                                    className="block px-3 py-2 rounded-md text-base font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-all duration-200 hover:translate-x-1"
+                                    onClick={() => toggleMenu()}
+                                >
+                                    ⚙️ Admin Panel
+                                </Link>
+                            )}
                         </div>
                         <div className="pt-4 pb-3 border-t border-gray-200">
                             <div className="px-2 space-y-2">

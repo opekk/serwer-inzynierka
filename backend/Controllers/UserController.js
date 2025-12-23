@@ -135,42 +135,7 @@ export const login = async (req, res) => {
   }
 };
 
-export const verifyEmail = async (req, res) => {
-  try {
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(req.params.token)
-      .digest('hex');
-
-    const user = await User.findOne({
-      verificationToken: hashedToken,
-      verificationTokenExpires: { $gt: Date.now() }
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token weryfikacyjny jest nieprawidłowy lub wygasł'
-      });
-    }
-
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    res.status(200).json({
-      success: true,
-      message: 'Email został zweryfikowany pomyślnie'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas weryfikacji email',
-      error: error.message
-    });
-  }
-};
+// Email verification removed - not needed for this application
 
 export const forgotPassword = async (req, res) => {
   try {

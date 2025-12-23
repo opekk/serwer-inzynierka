@@ -3,6 +3,9 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
+import auctionRoutes from './routes/auctionRoutes.js';
+import bidRoutes from './routes/bidRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // ============================================
 // ENVIRONMENT VARIABLES
@@ -57,7 +60,7 @@ const connectDB = async () => {
     });
 
     console.log(` MongoDB Connected: ${conn.connection.host}`);
-    console.log(`=Ê Database: ${conn.connection.name}`);
+    console.log(`=ï¿½ Database: ${conn.connection.name}`);
   } catch (error) {
     console.error('L MongoDB Connection Error:', error.message);
     process.exit(1);
@@ -72,7 +75,7 @@ const connectDB = async () => {
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Server is running',
+    message: 'Serwer dziaÅ‚a prawidÅ‚owo',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
@@ -80,16 +83,21 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/users', userRoutes);
+app.use('/api/auctions', auctionRoutes);
+app.use('/api/bids', bidRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root Route
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Welcome to AuctionHub API',
+    message: 'Witaj w API AuctionHub',
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      users: '/api/users'
+      users: '/api/users',
+      auctions: '/api/auctions',
+      bids: '/api/bids'
     }
   });
 });
@@ -98,7 +106,7 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.originalUrl} not found`
+    message: `Nie znaleziono trasy ${req.originalUrl}`
   });
 });
 
@@ -167,16 +175,33 @@ const PORT = process.env.PORT || 8080;
 
 const startServer = async () => {
   try {
+    // Validate critical environment variables
+    if (!process.env.JWT_SECRET) {
+      console.error('FATAL ERROR: JWT_SECRET is not defined in environment variables.');
+      console.error('Please set JWT_SECRET in your .env file with a strong, random string.');
+      process.exit(1);
+    }
+
+    if (process.env.JWT_SECRET.length < 32) {
+      console.error('WARNING: JWT_SECRET should be at least 32 characters long for security.');
+    }
+
+    if (!process.env.MONGODB_URI) {
+      console.error('FATAL ERROR: MONGODB_URI is not defined in environment variables.');
+      console.error('Please set MONGODB_URI in your .env file.');
+      process.exit(1);
+    }
+
     // Connect to database first
     await connectDB();
 
     // Start server
     app.listen(PORT, () => {
-      console.log('\n=€ ===================================');
-      console.log(`=€ Server running on port ${PORT}`);
-      console.log(`=€ Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`=€ Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
-      console.log('=€ ===================================\n');
+      console.log('\n=ï¿½ ===================================');
+      console.log(`=ï¿½ Server running on port ${PORT}`);
+      console.log(`=ï¿½ Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`=ï¿½ Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+      console.log('=ï¿½ ===================================\n');
     });
   } catch (error) {
     console.error('Failed to start server:', error);

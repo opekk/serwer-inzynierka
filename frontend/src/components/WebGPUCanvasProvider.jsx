@@ -359,7 +359,7 @@ function SharedWebGPUCanvas({
       console.error('Emscripten abort:', what)
       globalState.moduleReady = false
       setModuleReady(false)
-      setError('WebAssembly initialization failed')
+      setError('Błąd inicjalizacji WebAssembly')
       setIsLoading(false)
     }
     moduleConfig.print = moduleConfig.print || ((text) => console.log('WASM:', text))
@@ -373,7 +373,7 @@ function SharedWebGPUCanvas({
       script.async = true
       script.onerror = () => {
         console.error('Failed to load main.js')
-        setError('Failed to load WebAssembly runtime')
+        setError('Nie udało się załadować środowiska WebAssembly')
         setIsLoading(false)
       }
 
@@ -565,7 +565,7 @@ export function WebGPUCanvasProvider({ children }) {
 
       if (!window.Module || typeof window.Module.change_model !== 'function') {
         console.error('Module.change_model not available')
-        setError('WebAssembly module missing required function')
+        setError('Brak wymaganej funkcji w module WebAssembly')
         return false
       }
 
@@ -578,7 +578,7 @@ export function WebGPUCanvasProvider({ children }) {
         return true
       } catch (err) {
         console.error('Error changing model:', err)
-        setError('Failed to change model')
+        setError('Nie udało się zmienić modelu')
         return false
       }
     },

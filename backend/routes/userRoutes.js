@@ -2,7 +2,6 @@ import express from 'express';
 import {
   register,
   login,
-  verifyEmail,
   getPublicProfile,
   getTopSellers,
   searchUsers,
@@ -27,11 +26,9 @@ const router = express.Router();
 router.post('/register', register);
 router.post('/login', login);
 
-router.get('/verify/:token', verifyEmail);
 router.get('/profile/:id', getPublicProfile);
 router.get('/top-sellers', getTopSellers);
 router.get('/search', searchUsers);
-router.get('/', getAllUsers);
 
 // ============================================
 // PROTECTED ROUTES (Authentication required)
@@ -49,6 +46,7 @@ router.delete('/me', deleteMe);
 // ============================================
 
 router.use(restrictTo('admin'));
+router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
