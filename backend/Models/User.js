@@ -3,26 +3,6 @@ import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import crypto from 'crypto';
 
-const addressSchema = new mongoose.Schema({
-  street: {
-    type: String,
-    trim: true
-  },
-  city: {
-    type: String,
-    trim: true
-  },
-  postalCode: {
-    type: String,
-    trim: true
-  },
-  country: {
-    type: String,
-    trim: true,
-    default: 'Polska'
-  }
-}, { _id: false });
-
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -73,7 +53,6 @@ const userSchema = new mongoose.Schema({
       message: 'Podaj prawidłowy numer telefonu'
     }
   },
-  address: addressSchema,
   rating: {
     type: Number,
     default: 0,
@@ -85,11 +64,6 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
-  accountBalance: {
-    type: Number,
-    default: 0,
-    min: [0, 'Saldo konta nie może być ujemne']
-  },
   role: {
     type: String,
     enum: {
@@ -98,16 +72,9 @@ const userSchema = new mongoose.Schema({
     },
     default: 'user'
   },
-  avatar: {
-    type: String, // URL do avatara
-    default: null
-  },
   isActive: {
     type: Boolean,
     default: true
-  },
-  lastLogin: {
-    type: Date
   },
   passwordChangedAt: {
     type: Date,
@@ -151,17 +118,6 @@ const userSchema = new mongoose.Schema({
       type: Number,
       default: 0
     }
-  },
-  // Preferencje użytkownika
-  preferences: {
-    smsNotifications: {
-      type: Boolean,
-      default: false
-    },
-    newsletterSubscription: {
-      type: Boolean,
-      default: false
-    }
   }
 }, {
   timestamps: true, // Automatycznie dodaje createdAt i updatedAt
@@ -186,27 +142,6 @@ userSchema.virtual('fullName').get(function() {
     return `${this.firstName} ${this.lastName}`;
   }
   return this.username;
-});
-
-// Wirtualne pole dla aukcji użytkownika
-userSchema.virtual('auctions', {
-  ref: 'Auction',
-  localField: '_id',
-  foreignField: 'seller'
-});
-
-// Wirtualne pole dla wygranych aukcji
-userSchema.virtual('wonAuctions', {
-  ref: 'Auction',
-  localField: '_id',
-  foreignField: 'winnerId'
-});
-
-// Wirtualne pole dla opinii otrzymanych
-userSchema.virtual('receivedFeedbacks', {
-  ref: 'Feedback',
-  localField: '_id',
-  foreignField: 'toUser'
 });
 
 // ============================================
@@ -238,15 +173,10 @@ userSchema.pre('remove', async function(next) {
   try {
     // Usuń wszystkie aukcje użytkownika
     await this.model('Auction').deleteMany({ seller: this._id });
-    
+
     // Usuń wszystkie bidy użytkownika
     await this.model('Bid').deleteMany({ bidder: this._id });
-    
-    // Usuń wszystkie opinie użytkownika
-    await this.model('Feedback').deleteMany({ 
-      $or: [{ fromUser: this._id }, { toUser: this._id }]
-    });
-    
+
     next();
   } catch (error) {
     next(error);
@@ -271,37 +201,6 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
   return false;
 };
 
-// Metoda do aktualizacji ratingu
-userSchema.methods.updateRating = async function(newRating) {
-  const totalRating = (this.rating * this.ratingCount) + newRating;
-  this.ratingCount += 1;
-  this.rating = totalRating / this.ratingCount;
-  await this.save();
-};
-
-// Metoda do zwiększenia salda konta
-userSchema.methods.addBalance = async function(amount) {
-  if (amount <= 0) {
-    throw new Error('Kwota musi być większa od zera');
-  }
-  this.accountBalance += amount;
-  await this.save();
-  return this.accountBalance;
-};
-
-// Metoda do zmniejszenia salda konta
-userSchema.methods.deductBalance = async function(amount) {
-  if (amount <= 0) {
-    throw new Error('Kwota musi być większa od zera');
-  }
-  if (this.accountBalance < amount) {
-    throw new Error('Niewystarczające środki na koncie');
-  }
-  this.accountBalance -= amount;
-  await this.save();
-  return this.accountBalance;
-};
-
 // Metoda do pobierania publicznego profilu użytkownika
 userSchema.methods.getPublicProfile = function() {
   return {
@@ -311,7 +210,6 @@ userSchema.methods.getPublicProfile = function() {
     rating: this.rating,
     ratingCount: this.ratingCount,
     isVerified: this.isEmailVerified,
-    avatar: this.avatar,
     memberSince: this.createdAt,
     stats: this.stats
   };
@@ -371,13 +269,13 @@ userSchema.statics.findByCredential = async function(credential) {
 
 // Metoda statyczna do pobierania najlepszych sprzedawców
 userSchema.statics.getTopSellers = async function(limit = 10) {
-  return await this.find({ 
+  return await this.find({
     'stats.totalItemsSold': { $gt: 0 },
-    isActive: true 
+    isActive: true
   })
     .sort({ rating: -1, 'stats.totalItemsSold': -1 })
     .limit(limit)
-    .select('username rating ratingCount stats.totalItemsSold avatar');
+    .select('username rating ratingCount stats.totalItemsSold');
 };
 
 // Metoda statyczna do wyszukiwania użytkowników
@@ -402,7 +300,7 @@ userSchema.statics.searchUsers = async function(query, options = {}) {
     .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
     .limit(limit)
     .skip((page - 1) * limit)
-    .select('username fullName rating avatar');
+    .select('username fullName rating');
   
   const total = await this.countDocuments({
     $or: [

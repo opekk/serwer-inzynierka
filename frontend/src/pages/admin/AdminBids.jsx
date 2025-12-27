@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { adminAPI } from '../../services/adminApi';
+import { formatDate } from '../../utils/dateHelpers';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
@@ -74,17 +75,6 @@ export default function AdminBids() {
     } catch (err) {
       alert('Błąd: ' + err.message);
     }
-  };
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleString('pl-PL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
   };
 
   return (
@@ -169,7 +159,6 @@ export default function AdminBids() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kwota</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP / User Agent</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Akcje</th>
                   </tr>
                 </thead>
@@ -225,12 +214,6 @@ export default function AdminBids() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">{formatDate(bid.createdAt)}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-xs text-gray-600 max-w-xs">
-                          <div className="truncate">IP: {bid.ipAddress || 'N/A'}</div>
-                          <div className="truncate">UA: {bid.userAgent?.substring(0, 30) || 'N/A'}...</div>
-                        </div>
                       </td>
                       <td className="px-6 py-4">
                         {(bid.status === 'active' || bid.isWinning) && (

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../Models/User.js';
-import { sendErrorResponse, sendSuccessResponse } from '../utils/errorHandler.js';
+import { sendErrorResponse } from '../utils/errorHandler.js';
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -118,9 +118,6 @@ export const login = async (req, res) => {
         message: 'To konto zostało dezaktywowane'
       });
     }
-
-    user.lastLogin = Date.now();
-    await user.save({ validateBeforeSave: false });
 
     createSendToken(user, 200, res, 'Zalogowano pomyślnie');
   } catch (error) {
@@ -245,56 +242,6 @@ export const getPublicProfile = async (req, res) => {
   }
 };
 
-export const getTopSellers = async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit) || 10;
-    const topSellers = await User.getTopSellers(limit);
-
-    res.status(200).json({
-      success: true,
-      results: topSellers.length,
-      data: topSellers
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas pobierania najlepszych sprzedawców',
-      error: error.message
-    });
-  }
-};
-
-export const searchUsers = async (req, res) => {
-  try {
-    const { q, page, limit, sortBy, sortOrder } = req.query;
-
-    if (!q) {
-      return res.status(400).json({
-        success: false,
-        message: 'Podaj frazę wyszukiwania (q)'
-      });
-    }
-
-    const result = await User.searchUsers(q, {
-      page: parseInt(page) || 1,
-      limit: parseInt(limit) || 20,
-      sortBy: sortBy || 'createdAt',
-      sortOrder: sortOrder || 'desc'
-    });
-
-    res.status(200).json({
-      success: true,
-      ...result
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas wyszukiwania użytkowników',
-      error: error.message
-    });
-  }
-};
-
 // ============================================
 // PROTECTED ENDPOINTS (Authentication required)
 // ============================================
@@ -325,7 +272,7 @@ export const updateMe = async (req, res) => {
       });
     }
 
-    const allowedFields = ['firstName', 'lastName', 'phone', 'address', 'avatar'];
+    const allowedFields = ['firstName', 'lastName', 'phone'];
     const updates = {};
 
     Object.keys(req.body).forEach(key => {
@@ -408,40 +355,6 @@ export const updatePassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Błąd podczas zmiany hasła',
-      error: error.message
-    });
-  }
-};
-
-export const updatePreferences = async (req, res) => {
-  try {
-    const allowedPreferences = ['emailNotifications', 'smsNotifications', 'newsletterSubscription'];
-    const updates = { preferences: {} };
-
-    Object.keys(req.body).forEach(key => {
-      if (allowedPreferences.includes(key)) {
-        updates.preferences[key] = req.body[key];
-      }
-    });
-
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { $set: updates },
-      {
-        new: true,
-        runValidators: true
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: 'Preferencje zaktualizowane pomyślnie',
-      data: { preferences: user.preferences }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas aktualizacji preferencji',
       error: error.message
     });
   }

@@ -155,7 +155,9 @@ export const getAllUsers = async (req, res) => {
     if (role) query.role = role;
 
     // Filter by active status
-    if (isActive !== undefined) query.isActive = isActive === 'true';
+    if (isActive !== undefined && isActive !== '') {
+      query.isActive = isActive === 'true';
+    }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 

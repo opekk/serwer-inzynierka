@@ -14,9 +14,7 @@ import {
   removeFromWatchlist,
   getMyWatchlist,
   getMyAuctions,
-  getMyBids,
-  closeExpiredAuctions,
-  setFeatured
+  getMyBids
 } from '../Controllers/AuctionController.js';
 import { protect, restrictTo } from '../middleware/auth.js';
 
@@ -31,6 +29,7 @@ router.get('/search', searchAuctions);
 router.get('/featured', getFeaturedAuctions);
 router.get('/categories', getCategories);
 router.get('/:id/bids', getAuctionBids);
+router.get('/:id', getAuctionById); // Single auction - public access
 
 // ============================================
 // PROTECTED ROUTES (Authentication required)
@@ -38,13 +37,10 @@ router.get('/:id/bids', getAuctionBids);
 
 router.use(protect);
 
-// User-specific routes (MUST come before /:id routes to avoid matching 'me' as an ID)
+// User-specific routes (MUST come before other routes)
 router.get('/me/watchlist', getMyWatchlist);
 router.get('/me/auctions', getMyAuctions);
 router.get('/me/bids', getMyBids);
-
-// Single auction route (must come AFTER /me/* routes)
-router.get('/:id', getAuctionById);
 
 // Tworzenie i zarządzanie aukcjami
 router.post('/', createAuction);

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { adminAPI } from '../../services/adminApi';
+import { formatDate } from '../../utils/dateHelpers';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
@@ -87,16 +88,6 @@ export default function AdminAuctions() {
     } catch (err) {
       alert('Błąd: ' + err.message);
     }
-  };
-
-  const formatDate = (date) => {
-    return new Date(date).toLocaleString('pl-PL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import '../styles/index.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -6,10 +6,27 @@ import WebGPUCanvas from '../components/WebGPUCanvas'
 import AuctionCard from '../components/AuctionCard'
 import { Link, useNavigate } from 'react-router-dom'
 import { useWebGPUCanvas } from '../components/WebGPUCanvasProvider.jsx'
+import { auctionAPI } from '../services/api'
 
 export default function MainPage() {
   const navigate = useNavigate()
   const { changeModel, moduleReady } = useWebGPUCanvas()
+  const [activeAuctionsCount, setActiveAuctionsCount] = useState(0)
+
+  // Fetch active auctions count
+  useEffect(() => {
+    const fetchActiveAuctionsCount = async () => {
+      try {
+        const response = await auctionAPI.getAllAuctions({ status: 'active', limit: 1 })
+        if (response.success) {
+          setActiveAuctionsCount(response.total)
+        }
+      } catch (err) {
+        console.error('Error fetching active auctions count:', err)
+      }
+    }
+    fetchActiveAuctionsCount()
+  }, [])
 
   // Change to default model when returning to MainPage
   useEffect(() => {
@@ -161,7 +178,7 @@ export default function MainPage() {
           <div className="flex justify-end pt-10 items-center gap-4">
             <div className="relative inline-flex items-center w-fit">
               <div className="absolute -top-2 -right-3 z-10 inline-flex items-center justify-center rounded-full bg-red-600 px-3 py-1.5 text-center text-xs font-bold text-white">
-                12
+                {activeAuctionsCount}
               </div>
               <button
                 type="button"

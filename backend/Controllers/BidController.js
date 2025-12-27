@@ -1,6 +1,4 @@
-import Auction from '../Models/Auction.js';
 import Bid from '../Models/Bid.js';
-import { sendErrorResponse, sendSuccessResponse } from '../utils/errorHandler.js';
 
 // ============================================
 // PUBLIC ENDPOINTS (No authentication required)
@@ -210,7 +208,7 @@ export const getBidById = async (req, res) => {
   try {
     const bid = await Bid.findById(req.params.id)
       .populate('auction', 'title currentPrice endTime status seller')
-      .populate('bidder', 'username email rating avatar');
+      .populate('bidder', 'username email rating');
 
     if (!bid) {
       return res.status(404).json({

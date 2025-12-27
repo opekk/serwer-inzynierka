@@ -18,7 +18,6 @@ export default function AdminUsers() {
   const [filters, setFilters] = useState({
     page: 1,
     limit: 20,
-    search: '',
     role: '',
     isActive: '',
     sortBy: 'createdAt',
@@ -42,7 +41,11 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await adminAPI.getAllUsers(filters);
+      // Remove empty string values from filters
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      const response = await adminAPI.getAllUsers(cleanFilters);
       if (response.success) {
         setUsers(response.data);
         setPagination({
@@ -97,8 +100,7 @@ export default function AdminUsers() {
       username: formData.get('username'),
       email: formData.get('email'),
       role: formData.get('role'),
-      isActive: formData.get('isActive') === 'true',
-      isEmailVerified: formData.get('isEmailVerified') === 'true'
+      isActive: formData.get('isActive') === 'true'
     };
 
     try {
@@ -137,15 +139,7 @@ export default function AdminUsers() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <input
-              type="text"
-              placeholder="Szukaj po nazwie lub email..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg"
-            />
-
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <select
               value={filters.role}
               onChange={(e) => handleFilterChange('role', e.target.value)}
@@ -216,9 +210,6 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-gray-900">{u.email}</div>
-                      <div className="text-sm text-gray-500">
-                        {u.isEmailVerified ? '✅ Zweryfikowany' : '❌ Nie zweryfikowany'}
-                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -342,18 +333,6 @@ export default function AdminUsers() {
                   >
                     <option value="true">Aktywny</option>
                     <option value="false">Zablokowany</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Email Zweryfikowany</label>
-                  <select
-                    name="isEmailVerified"
-                    defaultValue={selectedUser.isEmailVerified.toString()}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="true">Tak</option>
-                    <option value="false">Nie</option>
                   </select>
                 </div>
               </div>

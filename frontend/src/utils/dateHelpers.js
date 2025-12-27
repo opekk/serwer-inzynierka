@@ -37,15 +37,6 @@ export const formatTimeRemaining = (endTime) => {
 };
 
 /**
- * Check if auction/event is still active
- * @param {string|Date} endTime - End date/time
- * @returns {boolean} True if still active
- */
-export const isActive = (endTime) => {
-  return new Date(endTime) > new Date();
-};
-
-/**
  * Get year from date
  * @param {string|Date} date - Date to extract year from
  * @returns {number} Year

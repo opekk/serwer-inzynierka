@@ -1,6 +1,6 @@
 import { handleResponse, getAuthHeaders } from '../utils/apiHelpers';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Admin API calls
 export const adminAPI = {
@@ -33,14 +33,6 @@ export const adminAPI = {
   getAllUsers: async (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
     const response = await fetch(`${API_URL}/admin/users?${queryString}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    return handleResponse(response);
-  },
-
-  getUserById: async (id) => {
-    const response = await fetch(`${API_URL}/admin/users/${id}`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });

@@ -34,14 +34,3 @@ export const getAuthHeaders = () => {
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
 };
-
-/**
- * Get authentication headers without Content-Type (for file uploads)
- * @returns {Object} Headers object with only Authorization
- */
-export const getAuthHeadersWithoutContentType = () => {
-  const token = localStorage.getItem('token');
-  return {
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-};

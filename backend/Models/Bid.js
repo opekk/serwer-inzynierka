@@ -100,22 +100,6 @@ bidSchema.methods.cancel = async function(reason) {
   return this;
 };
 
-// Metoda do oznaczenia jako wygraną
-bidSchema.methods.markAsWon = async function() {
-  this.status = 'won';
-  this.isWinning = true;
-  await this.save();
-  return this;
-};
-
-// Metoda do oznaczenia jako przegraną
-bidSchema.methods.markAsLost = async function() {
-  this.status = 'lost';
-  this.isWinning = false;
-  await this.save();
-  return this;
-};
-
 // ============================================
 // STATIC METHODS
 // ============================================
@@ -130,7 +114,7 @@ bidSchema.statics.getAuctionBids = function(auctionId, options = {}) {
   } = options;
 
   return this.find({ auction: auctionId })
-    .populate('bidder', 'username rating avatar')
+    .populate('bidder', 'username rating')
     .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
     .limit(limit)
     .skip((page - 1) * limit);
@@ -160,7 +144,7 @@ bidSchema.statics.getUserBids = function(userId, options = {}) {
 bidSchema.statics.getHighestBid = function(auctionId) {
   return this.findOne({ auction: auctionId })
     .sort({ amount: -1 })
-    .populate('bidder', 'username rating avatar');
+    .populate('bidder', 'username rating');
 };
 
 // Metoda do pobierania aktywnych bidów użytkownika
@@ -172,21 +156,6 @@ bidSchema.statics.getUserActiveBids = function(userId) {
   })
     .populate('auction', 'title currentPrice endTime status images')
     .sort({ createdAt: -1 });
-};
-
-// Metoda do oznaczania przegranych bidów po zakończeniu aukcji
-bidSchema.statics.markLostBids = async function(auctionId, winnerId) {
-  await this.updateMany(
-    {
-      auction: auctionId,
-      bidder: { $ne: winnerId },
-      status: { $in: ['active', 'outbid'] }
-    },
-    {
-      status: 'lost',
-      isWinning: false
-    }
-  );
 };
 
 // Metoda do statystyk bidowania dla aukcji

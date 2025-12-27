@@ -286,26 +286,42 @@ auctionSchema.pre('remove', async function(next) {
 // INSTANCE METHODS
 // ============================================
 
-// Metoda do zwiększenia liczby wyświetleń
+// Metoda do zwiększenia liczby wyświetleń (atomic update - bez race condition)
 auctionSchema.methods.incrementViews = async function() {
-  this.views += 1;
-  await this.save({ validateBeforeSave: false });
+  const updated = await this.constructor.findByIdAndUpdate(
+    this._id,
+    { $inc: { views: 1 } },
+    { new: true }
+  );
+  if (updated) {
+    this.views = updated.views;
+  }
   return this.views;
 };
 
-// Metoda do dodania obserwującego
+// Metoda do dodania obserwującego (atomic update - bez race condition)
 auctionSchema.methods.addWatcher = async function(userId) {
-  if (!this.watchers.includes(userId)) {
-    this.watchers.push(userId);
-    await this.save({ validateBeforeSave: false });
+  const updated = await this.constructor.findByIdAndUpdate(
+    this._id,
+    { $addToSet: { watchers: userId } },
+    { new: true }
+  );
+  if (updated) {
+    this.watchers = updated.watchers;
   }
   return this;
 };
 
-// Metoda do usunięcia obserwującego
+// Metoda do usunięcia obserwującego (atomic update - bez race condition)
 auctionSchema.methods.removeWatcher = async function(userId) {
-  this.watchers = this.watchers.filter(id => !id.equals(userId));
-  await this.save({ validateBeforeSave: false });
+  const updated = await this.constructor.findByIdAndUpdate(
+    this._id,
+    { $pull: { watchers: userId } },
+    { new: true }
+  );
+  if (updated) {
+    this.watchers = updated.watchers;
+  }
   return this;
 };
 
@@ -364,35 +380,6 @@ auctionSchema.methods.softDelete = async function() {
 // STATIC METHODS
 // ============================================
 
-// Metoda do znajdowania aktywnych aukcji
-auctionSchema.statics.findActive = function(options = {}) {
-  const {
-    page = 1,
-    limit = 20,
-    category,
-    minPrice,
-    maxPrice,
-    sortBy = 'endTime',
-    sortOrder = 'asc'
-  } = options;
-
-  const query = {
-    status: 'active',
-    endTime: { $gt: Date.now() },
-    isDeleted: false
-  };
-
-  if (category) query.category = category;
-  if (minPrice) query.currentPrice = { ...query.currentPrice, $gte: minPrice };
-  if (maxPrice) query.currentPrice = { ...query.currentPrice, $lte: maxPrice };
-
-  return this.find(query)
-    .populate('seller', 'username rating avatar')
-    .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
-    .limit(limit)
-    .skip((page - 1) * limit);
-};
-
 // Metoda do wyszukiwania aukcji
 auctionSchema.statics.searchAuctions = async function(query, options = {}) {
   const {
@@ -425,7 +412,7 @@ auctionSchema.statics.searchAuctions = async function(query, options = {}) {
     : { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
   const auctions = await this.find(searchQuery, { score: { $meta: 'textScore' } })
-    .populate('seller', 'username rating avatar')
+    .populate('seller', 'username rating')
     .sort(sortOptions)
     .limit(limit)
     .skip((page - 1) * limit);
@@ -462,7 +449,7 @@ auctionSchema.statics.getFeatured = function(limit = 10) {
     endTime: { $gt: Date.now() },
     isDeleted: false
   })
-    .populate('seller', 'username rating avatar')
+    .populate('seller', 'username rating')
     .sort({ createdAt: -1 })
     .limit(limit);
 };

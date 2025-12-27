@@ -1,7 +1,6 @@
 import Auction from '../Models/Auction.js';
 import Bid from '../Models/Bid.js';
 import User from '../Models/User.js';
-import { sendErrorResponse, sendSuccessResponse } from '../utils/errorHandler.js';
 
 // ============================================
 // PUBLIC ENDPOINTS (No authentication required)
@@ -46,7 +45,7 @@ export const getAllAuctions = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const auctions = await Auction.find(query)
-      .populate('seller', 'username rating avatar')
+      .populate('seller', 'username rating')
       .populate('winnerId', 'username')
       .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
       .limit(parseInt(limit))
@@ -75,8 +74,8 @@ export const getAllAuctions = async (req, res) => {
 export const getAuctionById = async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id)
-      .populate('seller', 'username rating avatar email phone')
-      .populate('winnerId', 'username rating avatar');
+      .populate('seller', 'username rating email phone')
+      .populate('winnerId', 'username rating');
 
     if (!auction || auction.isDeleted) {
       return res.status(404).json({
@@ -602,7 +601,7 @@ export const placeBid = async (req, res) => {
 
     // Populate bid for response
     const populatedBid = await Bid.findById(bid._id)
-      .populate('bidder', 'username rating avatar')
+      .populate('bidder', 'username rating')
       .populate('auction', 'title currentPrice endTime');
 
     console.log('SUCCESS: Bid placed successfully');
@@ -694,7 +693,7 @@ export const getMyWatchlist = async (req, res) => {
       watchers: req.user._id,
       isDeleted: false
     })
-      .populate('seller', 'username rating avatar')
+      .populate('seller', 'username rating')
       .sort({ endTime: 1 });
 
     res.status(200).json({
@@ -789,54 +788,3 @@ export const getMyBids = async (req, res) => {
 // ============================================
 // ADMIN ENDPOINTS (Admin role required)
 // ============================================
-
-// Zamknij wygasłe aukcje (cron job)
-export const closeExpiredAuctions = async (req, res) => {
-  try {
-    const closedCount = await Auction.closeExpiredAuctions();
-
-    res.status(200).json({
-      success: true,
-      message: `Zamknięto ${closedCount} aukcji`,
-      data: { closedCount }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas zamykania aukcji',
-      error: error.message
-    });
-  }
-};
-
-// Ustaw aukcję jako polecaną
-export const setFeatured = async (req, res) => {
-  try {
-    const { featured } = req.body;
-
-    const auction = await Auction.findByIdAndUpdate(
-      req.params.id,
-      { featured: featured === true },
-      { new: true }
-    );
-
-    if (!auction) {
-      return res.status(404).json({
-        success: false,
-        message: 'Nie znaleziono aukcji'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: `Aukcja ${featured ? 'dodana do' : 'usunięta z'} polecanych`,
-      data: auction
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas aktualizacji aukcji',
-      error: error.message
-    });
-  }
-};

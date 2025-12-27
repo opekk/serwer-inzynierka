@@ -115,7 +115,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Link to="/admin/users" className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center">
             <div className="text-3xl mb-2">👥</div>
             <div className="font-semibold">Użytkownicy</div>
@@ -127,10 +127,6 @@ export default function AdminDashboard() {
           <Link to="/admin/bids" className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-center">
             <div className="text-3xl mb-2">💰</div>
             <div className="font-semibold">Oferty</div>
-          </Link>
-          <Link to="/admin/reports" className="bg-orange-600 hover:bg-orange-700 text-white p-6 rounded-lg text-center">
-            <div className="text-3xl mb-2">📊</div>
-            <div className="font-semibold">Raporty</div>
           </Link>
         </div>
 
