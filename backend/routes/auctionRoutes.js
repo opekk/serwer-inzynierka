@@ -54,13 +54,4 @@ router.post('/:id/bid', placeBid);
 router.post('/:id/watch', addToWatchlist);
 router.delete('/:id/watch', removeFromWatchlist);
 
-// ============================================
-// ADMIN ROUTES (Admin role required)
-// ============================================
-
-router.use(restrictTo('admin'));
-
-router.post('/admin/close-expired', closeExpiredAuctions);
-router.patch('/:id/featured', setFeatured);
-
 export default router;

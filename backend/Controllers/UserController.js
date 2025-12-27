@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import User from '../Models/User.js';
 import { sendErrorResponse } from '../utils/errorHandler.js';
 
@@ -122,97 +121,6 @@ export const login = async (req, res) => {
     createSendToken(user, 200, res, 'Zalogowano pomyślnie');
   } catch (error) {
     return sendErrorResponse(res, 500, 'Błąd podczas logowania', error);
-  }
-};
-
-// Email verification removed - not needed for this application
-
-export const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Podaj adres email'
-      });
-    }
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'Nie znaleziono użytkownika z tym adresem email'
-      });
-    }
-
-    const resetToken = user.createPasswordResetToken();
-    await user.save({ validateBeforeSave: false });
-
-    // TODO: Send reset email here
-    console.log('Reset token:', resetToken);
-
-    res.status(200).json({
-      success: true,
-      message: 'Token resetowania hasła zostaB wysłany na email'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas wysyBania tokenu resetowania',
-      error: error.message
-    });
-  }
-};
-
-export const resetPassword = async (req, res) => {
-  try {
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(req.params.token)
-      .digest('hex');
-
-    const user = await User.findOne({
-      passwordResetToken: hashedToken,
-      passwordResetExpires: { $gt: Date.now() }
-    }).select('+password');
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token resetowania jest nieprawidłowy lub wygasł'
-      });
-    }
-
-    const { password, passwordConfirm } = req.body;
-
-    if (!password || !passwordConfirm) {
-      return res.status(400).json({
-        success: false,
-        message: 'Podaj hasło i potwierdzenie hasła'
-      });
-    }
-
-    if (password !== passwordConfirm) {
-      return res.status(400).json({
-        success: false,
-        message: 'Hasła nie są identyczne'
-      });
-    }
-
-    user.password = password;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save();
-
-    createSendToken(user, 200, res, 'Hasło zostało zresetowane pomyślnie');
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Błąd podczas resetowania hasBa',
-      error: error.message
-    });
   }
 };
 
